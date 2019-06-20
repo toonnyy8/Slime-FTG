@@ -38,9 +38,10 @@ function createScene() {
         console.log(animationGroups)
         animationGroup = animationGroups[0] //.start(false)
 
-        animationGroup.start(true)
+        animationGroup.start(true, 1, 0 / 24, 5 / 24)
         animationGroup.goToFrame(0)
-        animationGroup.pause()
+        // animationGroup.pause()
+        //animationGroup.pause()
     }, null, null, ".glb")
 
     let advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI")
