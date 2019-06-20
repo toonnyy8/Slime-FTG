@@ -36,17 +36,27 @@ function createScene() {
 
     let assetsManager = new BABYLON.AssetsManager(scene)
     let meshTask = assetsManager.addMeshTask("Character", "", "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/AnimatedMorphCube/glTF-Binary/", "AnimatedMorphCube.glb")
+
     meshTask.onSuccess = (task) => {
-        animationGroup = scene.animationGroups[0] //.start(false)
+        /*animationGroup = scene.animationGroups[0] //.start(false)
 
         animationGroup.start(true)
         animationGroup.goToFrame(0)
-        animationGroup.pause()
+        animationGroup.pause()*/
     }
     meshTask.onError = (task, message, exception) => {
         console.log(message, exception)
     }
+
     assetsManager.load()
+
+    BABYLON.SceneLoader.ImportMesh("", url["slime"], "", scene, (meshes, particleSystems, skeletons, animationGroups) => {
+        animationGroup = scene.animationGroups[1] //.start(false)
+
+        animationGroup.start(true)
+        animationGroup.goToFrame(0)
+        animationGroup.pause()
+    }, null, null, ".glb")
 
     let advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI")
 
@@ -70,17 +80,13 @@ function createScene() {
     slider.onValueChangedObservable.add((value) => {
         animationGroup.goToFrame(value)
         animationGroup.pause()
-        console.log(value)
+        console.log(value * 24)
     })
 
     panel.addControl(slider)
 
 
-    BABYLON.SceneLoader.ImportMesh("", url["slime"], "", scene, (meshes, particleSystems, skeletons, animationGroups) => {
-        console.log(scene.animationGroups[1])
-        //scene.animationGroups[1].goToFrame(7 / 24)
-        //scene.animationGroups[1].pause()
-    }, null, null, ".glb")
+
 
     return scene
 
