@@ -4,15 +4,12 @@ import fs from 'fs'
 
 import * as BABYLON from './babylon-module'
 
-let slime = fs.readFileSync(__dirname + '../../../file/slime.glb')
-
-let url = {
-    "slime": URL.createObjectURL(new Blob([slime]))
+let slime = {
+    "init": URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime.glb')])),
+    "walk": URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime.walk.glb')])),
+    "jump": URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime.jump.b.glb')])),
 }
 
-let loader = new BABYLON.GLTFFileLoader()
-
-console.log()
 // Get the canvas DOM element
 let canvas = document.getElementById('bobylonCanvas')
 // Load the 3D engine
@@ -24,25 +21,26 @@ function createScene() {
     let scene = new BABYLON.Scene(engine)
     //Adding a light
     let light = new BABYLON.HemisphericLight()
-
     //Adding an Arc Rotate Camera
-    let camera = new BABYLON.ArcRotateCamera("Camera", 0, 0.8, 10, BABYLON.Vector3.Zero(), scene)
+    let camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 10, new BABYLON.Vector3(0, 0, 0), scene)
     camera.attachControl(canvas, false)
 
     let animationGroup
     BABYLON.SceneLoader.OnPluginActivatedObservable.addOnce(loader => {
         loader.animationStartMode = BABYLON.GLTFLoaderAnimationStartMode.NONE
     })
+    BABYLON.SceneLoader.ImportMesh("", slime["walk"], "", scene, (meshes, particleSystems, skeletons, animationGroups) => {
 
-    BABYLON.SceneLoader.ImportMesh("", url["slime"], "", scene, (meshes, particleSystems, skeletons, animationGroups) => {
-        console.log(animationGroups)
         animationGroup = animationGroups[0] //.start(false)
 
-        animationGroup.start(true, 1, 0 / 24, 5 / 24)
-        animationGroup.goToFrame(0)
+        animationGroup.start(true, 1, 0 / 60, 100 / 60)
+        animationGroup.goToFrame(85 / 60)
         // animationGroup.pause()
         //animationGroup.pause()
+
+
     }, null, null, ".glb")
+
 
     let advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI")
 
@@ -57,7 +55,7 @@ function createScene() {
 
     let slider = new BABYLON.GUI.Slider()
     slider.minimum = 0
-    slider.maximum = 10 / 24
+    slider.maximum = 100 / 60
     slider.value = 0
     slider.paddingTop = "10px"
     slider.height = "30px"
@@ -66,7 +64,7 @@ function createScene() {
     slider.onValueChangedObservable.add((value) => {
         animationGroup.goToFrame(value)
         animationGroup.pause()
-        console.log(Math.floor(value * 24))
+        console.log(Math.floor(value * 60))
     })
 
     panel.addControl(slider)
