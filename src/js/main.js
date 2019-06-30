@@ -48,10 +48,10 @@ function createScene() {
             })
         }
         play()*/
-        animationGroup.start(false, 1, 1 / 60, 50 / 60)
+        animationGroup.start(true, 1, 71 / 60, 110 / 60)
         let loop = () => {
             setTimeout(() => {
-                animationGroup.start(false, 1, 1 / 60, 50 / 60)
+                animationGroup.start(false, 1, 51 / 60, 70 / 60)
                 //console.log(1);
                 animationGroup.onAnimationEndObservable.addOnce(loop)
             }, 0)
