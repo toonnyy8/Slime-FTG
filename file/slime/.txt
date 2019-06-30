@@ -1,0 +1,3 @@
+walk:1~30
+jump up:31~40
+jump down:41~50

@@ -3,11 +3,10 @@ import "@babel/polyfill"
 import fs from 'fs'
 
 import * as BABYLON from './babylon-module'
+import { async } from "q";
 
-let slime = {
-    "init": URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime.glb')])),
-    "walk": URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime.walk.glb')])),
-    "jump": URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime.jump.b.glb')])),
+let url = {
+    "slime": URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime.glb')])),
 }
 
 // Get the canvas DOM element
@@ -29,16 +28,39 @@ function createScene() {
     BABYLON.SceneLoader.OnPluginActivatedObservable.addOnce(loader => {
         loader.animationStartMode = BABYLON.GLTFLoaderAnimationStartMode.NONE
     })
-    BABYLON.SceneLoader.ImportMesh("", slime["walk"], "", scene, (meshes, particleSystems, skeletons, animationGroups) => {
-
+    BABYLON.SceneLoader.ImportMesh("", url["slime"], "", scene, (meshes, particleSystems, skeletons, animationGroups) => {
+        console.log(skeletons)
+        console.log(meshes)
+        console.log(animationGroups)
         animationGroup = animationGroups[0] //.start(false)
 
-        animationGroup.start(true, 1, 0 / 60, 100 / 60)
-        animationGroup.goToFrame(85 / 60)
-        // animationGroup.pause()
+        /*let play = () => {
+            setTimeout(() => {
+                animationGroup.start(false, 1, 0 / 60, 30 / 60)
+                let loop = () => {
+                    setTimeout(() => {
+                        animationGroup.start(false, -1, 12 / 60, 0 / 60)
+                        //console.log(1);
+                        animationGroup.onAnimationEndObservable.addOnce(play)
+                    })
+                }
+                animationGroup.onAnimationEndObservable.addOnce(loop)
+            })
+        }
+        play()*/
+        animationGroup.start(false, 1, 1 / 60, 50 / 60)
+        let loop = () => {
+            setTimeout(() => {
+                animationGroup.start(false, 1, 1 / 60, 50 / 60)
+                //console.log(1);
+                animationGroup.onAnimationEndObservable.addOnce(loop)
+            }, 0)
+        }
+        animationGroup.onAnimationEndObservable.addOnce(loop)
+
+        //animationGroup.goToFrame(0 / 60)
         //animationGroup.pause()
-
-
+        //animationGroup.pause()
     }, null, null, ".glb")
 
 
@@ -55,7 +77,7 @@ function createScene() {
 
     let slider = new BABYLON.GUI.Slider()
     slider.minimum = 0
-    slider.maximum = 100 / 60
+    slider.maximum = 94 / 60
     slider.value = 0
     slider.paddingTop = "10px"
     slider.height = "30px"
