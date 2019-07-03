@@ -3,11 +3,10 @@ import "@babel/polyfill"
 import fs from 'fs'
 
 import * as BABYLON from './babylon-module'
-import { async } from "q";
 
-let url = {
-    "slime": URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime.glb')])),
-}
+import slime from "../../file/slime/slime.json"
+slime.url = URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime/slime.glb')]))
+console.log(slime)
 
 // Get the canvas DOM element
 let canvas = document.getElementById('bobylonCanvas')
@@ -28,7 +27,7 @@ function createScene() {
     BABYLON.SceneLoader.OnPluginActivatedObservable.addOnce(loader => {
         loader.animationStartMode = BABYLON.GLTFLoaderAnimationStartMode.NONE
     })
-    BABYLON.SceneLoader.ImportMesh("", url["slime"], "", scene, (meshes, particleSystems, skeletons, animationGroups) => {
+    BABYLON.SceneLoader.ImportMesh("", slime.url, "", scene, (meshes, particleSystems, skeletons, animationGroups) => {
         console.log(skeletons)
         console.log(meshes)
         console.log(animationGroups)
@@ -48,10 +47,10 @@ function createScene() {
             })
         }
         play()*/
-        animationGroup.start(true, 1, 71 / 60, 110 / 60)
+        animationGroup.start(true, 1, slime.action.stand.start / slime.fps, slime.action.stand.end / slime.fps)
         let loop = () => {
             setTimeout(() => {
-                animationGroup.start(false, 1, 51 / 60, 70 / 60)
+                animationGroup.start(false, 1, slime.action.jump.start / slime.fps, slime.action.jump.end / slime.fps)
                 //console.log(1);
                 animationGroup.onAnimationEndObservable.addOnce(loop)
             }, 0)

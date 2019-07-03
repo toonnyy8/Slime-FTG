@@ -1,0 +1,25 @@
+{
+    "fps": 60,
+    "action": {
+        "walk": {
+            "start": 1,
+            "end": 30
+        },
+        "jump up": {
+            "start": 31,
+            "end": 40
+        },
+        "jump down": {
+            "start": 41,
+            "end": 50
+        },
+        "jump": {
+            "start": 51,
+            "end": 70
+        },
+        "stand": {
+            "start": 71,
+            "end": 110
+        }
+    }
+}
