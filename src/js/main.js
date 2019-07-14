@@ -5,6 +5,7 @@ import fs from 'fs'
 import * as BABYLON from './babylon-module'
 
 import slime from "../../file/slime/slime.json"
+import { async } from "q";
 slime.url = URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime/slime.glb')]))
 console.log(slime)
 
@@ -33,33 +34,20 @@ function createScene() {
         console.log(animationGroups)
         animationGroup = animationGroups[0] //.start(false)
 
-        /*let play = () => {
-            setTimeout(() => {
-                animationGroup.start(false, 1, 0 / 60, 30 / 60)
-                let loop = () => {
-                    setTimeout(() => {
-                        animationGroup.start(false, -1, 12 / 60, 0 / 60)
-                        //console.log(1);
-                        animationGroup.onAnimationEndObservable.addOnce(play)
-                    })
-                }
-                animationGroup.onAnimationEndObservable.addOnce(loop)
-            })
-        }
-        play()*/
-        animationGroup.start(true, 1, slime.action.stand.start / slime.fps, slime.action.stand.end / slime.fps)
+        slime.stand = animationGroup.clone()
+        slime.stand.normalize(slime.action.stand.start / slime.fps, slime.action.stand.end / slime.fps)
+        slime.jumping = animationGroup.clone()
+        slime.jumping.normalize(slime.action.jumping.start / slime.fps, slime.action.jumping.end / slime.fps)
         let loop = () => {
             setTimeout(() => {
-                animationGroup.start(false, 1, slime.action.jump.start / slime.fps, slime.action.jump.end / slime.fps)
-                //console.log(1);
-                animationGroup.onAnimationEndObservable.addOnce(loop)
-            }, 0)
+                slime.jumping.stop()
+                slime.jumping.start()
+                slime.jumping.onAnimationEndObservable.addOnce(loop)
+                console.log(1)
+            })
         }
-        animationGroup.onAnimationEndObservable.addOnce(loop)
-
-        //animationGroup.goToFrame(0 / 60)
-        //animationGroup.pause()
-        //animationGroup.pause()
+        slime.jumping.onAnimationEndObservable.addOnce(loop)
+        slime.jumping.start()
     }, null, null, ".glb")
 
 

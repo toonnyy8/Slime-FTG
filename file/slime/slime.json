@@ -5,15 +5,15 @@
             "start": 1,
             "end": 30
         },
-        "jump up": {
+        "jumpUp": {
             "start": 31,
             "end": 40
         },
-        "jump down": {
+        "jumpDown": {
             "start": 41,
             "end": 50
         },
-        "jump": {
+        "jumping": {
             "start": 51,
             "end": 70
         },
