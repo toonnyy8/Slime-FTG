@@ -45,16 +45,19 @@ function createScene() {
 
         slime.action.attackMedium._ = animationGroup.clone()
         slime.action.attackMedium._.normalize(slime.action.attackMedium.start / slime.fps, slime.action.attackMedium.end / slime.fps)
+
+        slime.action.attackWeighty._ = animationGroup.clone()
+        slime.action.attackWeighty._.normalize(slime.action.attackWeighty.start / slime.fps, slime.action.attackWeighty.end / slime.fps)
         let loop = () => {
             setTimeout(() => {
-                slime.action.attackMedium._.stop()
-                slime.action.attackMedium._.start()
-                slime.action.attackMedium._.onAnimationEndObservable.addOnce(loop)
+                slime.action.attackWeighty._.stop()
+                slime.action.attackWeighty._.start()
+                slime.action.attackWeighty._.onAnimationEndObservable.addOnce(loop)
                 console.log(1)
             })
         }
-        slime.action.attackMedium._.onAnimationEndObservable.addOnce(loop)
-        slime.action.attackMedium._.start()
+        slime.action.attackWeighty._.onAnimationEndObservable.addOnce(loop)
+        slime.action.attackWeighty._.start()
     }, null, null, ".glb")
 
     // create a built-in "ground" shape;

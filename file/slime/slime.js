@@ -36,6 +36,11 @@ export let action = {
         start: 131,
         end: 160,
         _: null
+    },
+    attackWeighty: {
+        start: 161,
+        end: 200,
+        _: null
     }
 }
 export let url = URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime/slime.glb')]))
