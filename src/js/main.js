@@ -1,12 +1,9 @@
 import "@babel/polyfill"
 
-import fs from 'fs'
-
 import * as BABYLON from './babylon-module'
 
 import * as slime from "../../file/slime/slime.js"
 
-slime.url = URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime/slime.glb')]))
 console.log(slime)
 
 // Get the canvas DOM element
@@ -18,11 +15,14 @@ function createScene() {
 
     // This creates a basic Babylon Scene object (non-mesh)
     let scene = new BABYLON.Scene(engine)
-    //Adding a light
-    let light = new BABYLON.HemisphericLight()
     //Adding an Arc Rotate Camera
     let camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 10, new BABYLON.Vector3(0, 0, 0), scene)
+    // target the camera to scene origin
+    camera.setTarget(BABYLON.Vector3.Zero());
+    // attach the camera to the canvas
     camera.attachControl(canvas, false)
+    //Adding a light
+    let light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 5, 0), scene);
 
     let animationGroup
     BABYLON.SceneLoader.OnPluginActivatedObservable.addOnce(loader => {
@@ -34,52 +34,31 @@ function createScene() {
         console.log(animationGroups)
         animationGroup = animationGroups[0] //.start(false)
 
-        slime.stand = animationGroup.clone()
-        slime.stand.normalize(slime.action.stand.start / slime.fps, slime.action.stand.end / slime.fps)
-        slime.jumping = animationGroup.clone()
-        slime.jumping.normalize(slime.action.jumping.start / slime.fps, slime.action.jumping.end / slime.fps)
+        slime.action.stand._ = animationGroup.clone()
+        slime.action.stand._.normalize(slime.action.stand.start / slime.fps, slime.action.stand.end / slime.fps)
+
+        slime.action.jumping._ = animationGroup.clone()
+        slime.action.jumping._.normalize(slime.action.jumping.start / slime.fps, slime.action.jumping.end / slime.fps)
+
+        slime.action.attackLight._ = animationGroup.clone()
+        slime.action.attackLight._.normalize(slime.action.attackLight.start / slime.fps, slime.action.attackLight.end / slime.fps)
+
+        slime.action.attackMedium._ = animationGroup.clone()
+        slime.action.attackMedium._.normalize(slime.action.attackMedium.start / slime.fps, slime.action.attackMedium.end / slime.fps)
         let loop = () => {
             setTimeout(() => {
-                slime.jumping.stop()
-                slime.jumping.start()
-                slime.jumping.onAnimationEndObservable.addOnce(loop)
+                slime.action.attackMedium._.stop()
+                slime.action.attackMedium._.start()
+                slime.action.attackMedium._.onAnimationEndObservable.addOnce(loop)
                 console.log(1)
             })
         }
-        slime.jumping.onAnimationEndObservable.addOnce(loop)
-        slime.jumping.start()
+        slime.action.attackMedium._.onAnimationEndObservable.addOnce(loop)
+        slime.action.attackMedium._.start()
     }, null, null, ".glb")
 
-
-    let advancedTexture = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI")
-
-    let panel = new BABYLON.GUI.StackPanel()
-    panel.width = "220px"
-    panel.rotation = 0
-    panel.horizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT
-    panel.verticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_CENTER
-    advancedTexture.addControl(panel)
-
-    panel.addControl(slider)
-
-    let slider = new BABYLON.GUI.Slider()
-    slider.minimum = 0
-    slider.maximum = 94 / 60
-    slider.value = 0
-    slider.paddingTop = "10px"
-    slider.height = "30px"
-    slider.width = "200px"
-    slider.color = "green"
-    slider.onValueChangedObservable.add((value) => {
-        animationGroup.goToFrame(value)
-        animationGroup.pause()
-        console.log(Math.floor(value * 60))
-    })
-
-    panel.addControl(slider)
-
-
-
+    // create a built-in "ground" shape;
+    // var ground = BABYLON.Mesh.CreateGround('ground1', 6, 6, 2, scene);
 
     return scene
 
