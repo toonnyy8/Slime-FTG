@@ -4,8 +4,8 @@ import fs from 'fs'
 
 import * as BABYLON from './babylon-module'
 
-import slime from "../../file/slime/slime.json"
-import { async } from "q";
+import * as slime from "../../file/slime/slime.js"
+
 slime.url = URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime/slime.glb')]))
 console.log(slime)
 
