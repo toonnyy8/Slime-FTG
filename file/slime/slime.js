@@ -64,7 +64,7 @@ export let action = {
     },
     squat: {
         start: 341,
-        end: 380,
+        end: 400,
         _: null
     }
 }
