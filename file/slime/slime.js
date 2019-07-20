@@ -41,6 +41,31 @@ export let action = {
         start: 161,
         end: 200,
         _: null
+    },
+    attackLightJump: {
+        start: 201,
+        end: 220,
+        _: null
+    },
+    attackMediumJump: {
+        start: 221,
+        end: 260,
+        _: null
+    },
+    attackWeightyJump: {
+        start: 261,
+        end: 320,
+        _: null
+    },
+    crouch: {
+        start: 321,
+        end: 340,
+        _: null
+    },
+    squat: {
+        start: 341,
+        end: 380,
+        _: null
     }
 }
 export let url = URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime/slime.glb')]))

@@ -48,16 +48,32 @@ function createScene() {
 
         slime.action.attackWeighty._ = animationGroup.clone()
         slime.action.attackWeighty._.normalize(slime.action.attackWeighty.start / slime.fps, slime.action.attackWeighty.end / slime.fps)
+
+        slime.action.attackLightJump._ = animationGroup.clone()
+        slime.action.attackLightJump._.normalize(slime.action.attackLightJump.start / slime.fps, slime.action.attackLightJump.end / slime.fps)
+
+        slime.action.attackMediumJump._ = animationGroup.clone()
+        slime.action.attackMediumJump._.normalize(slime.action.attackMediumJump.start / slime.fps, slime.action.attackMediumJump.end / slime.fps)
+
+        slime.action.attackWeightyJump._ = animationGroup.clone()
+        slime.action.attackWeightyJump._.normalize(slime.action.attackWeightyJump.start / slime.fps, slime.action.attackWeightyJump.end / slime.fps)
+
+        slime.action.crouch._ = animationGroup.clone()
+        slime.action.crouch._.normalize(slime.action.crouch.start / slime.fps, slime.action.crouch.end / slime.fps)
+
+        slime.action.squat._ = animationGroup.clone()
+        slime.action.squat._.normalize(slime.action.squat.start / slime.fps, slime.action.squat.end / slime.fps)
+
         let loop = () => {
             setTimeout(() => {
-                slime.action.attackWeighty._.stop()
-                slime.action.attackWeighty._.start()
-                slime.action.attackWeighty._.onAnimationEndObservable.addOnce(loop)
+                slime.action.squat._.stop()
+                slime.action.squat._.start()
+                slime.action.squat._.onAnimationEndObservable.addOnce(loop)
                 console.log(1)
             })
         }
-        slime.action.attackWeighty._.onAnimationEndObservable.addOnce(loop)
-        slime.action.attackWeighty._.start()
+        slime.action.squat._.onAnimationEndObservable.addOnce(loop)
+        slime.action.squat._.start()
     }, null, null, ".glb")
 
     // create a built-in "ground" shape;
