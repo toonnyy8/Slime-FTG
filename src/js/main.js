@@ -64,16 +64,19 @@ function createScene() {
         slime.action.squat._ = animationGroup.clone()
         slime.action.squat._.normalize(slime.action.squat.start / slime.fps, slime.action.squat.end / slime.fps)
 
+        slime.action.attackLightSquat._ = animationGroup.clone()
+        slime.action.attackLightSquat._.normalize(slime.action.attackLightSquat.start / slime.fps, slime.action.attackLightSquat.end / slime.fps)
+
         let loop = () => {
             setTimeout(() => {
-                slime.action.squat._.stop()
-                slime.action.squat._.start()
-                slime.action.squat._.onAnimationEndObservable.addOnce(loop)
+                slime.action.attackLightSquat._.stop()
+                slime.action.attackLightSquat._.start()
+                slime.action.attackLightSquat._.onAnimationEndObservable.addOnce(loop)
                 console.log(1)
             })
         }
-        slime.action.squat._.onAnimationEndObservable.addOnce(loop)
-        slime.action.squat._.start()
+        slime.action.attackLightSquat._.onAnimationEndObservable.addOnce(loop)
+        slime.action.attackLightSquat._.start()
     }, null, null, ".glb")
 
     // create a built-in "ground" shape;
