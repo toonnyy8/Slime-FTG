@@ -22,8 +22,8 @@ function createScene() {
     // attach the camera to the canvas
     camera.attachControl(canvas, false)
     //Adding a light
-    let light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 5, 0), scene);
-
+	let light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 5, 0), scene);
+	
     let animationGroup
     BABYLON.SceneLoader.OnPluginActivatedObservable.addOnce(loader => {
         loader.animationStartMode = BABYLON.GLTFLoaderAnimationStartMode.NONE
@@ -67,16 +67,22 @@ function createScene() {
         slime.action.attackLightSquat._ = animationGroup.clone()
         slime.action.attackLightSquat._.normalize(slime.action.attackLightSquat.start / slime.fps, slime.action.attackLightSquat.end / slime.fps)
 
-        let loop = () => {
+        slime.action.attackMediumSquat._ = animationGroup.clone()
+        slime.action.attackMediumSquat._.normalize(slime.action.attackMediumSquat.start / slime.fps, slime.action.attackMediumSquat.end / slime.fps)
+	
+        slime.action.attackWeightySquat._ = animationGroup.clone()
+        slime.action.attackWeightySquat._.normalize(slime.action.attackWeightySquat.start / slime.fps, slime.action.attackWeightySquat.end / slime.fps)
+
+	let loop = () => {
             setTimeout(() => {
-                slime.action.attackLightSquat._.stop()
-                slime.action.attackLightSquat._.start()
-                slime.action.attackLightSquat._.onAnimationEndObservable.addOnce(loop)
+                slime.action.attackWeightySquat._.stop()
+                slime.action.attackWeightySquat._.start()
+                slime.action.attackWeightySquat._.onAnimationEndObservable.addOnce(loop)
                 console.log(1)
             })
         }
-        slime.action.attackLightSquat._.onAnimationEndObservable.addOnce(loop)
-        slime.action.attackLightSquat._.start()
+        slime.action.attackWeightySquat._.onAnimationEndObservable.addOnce(loop)
+        slime.action.attackWeightySquat._.start()
     }, null, null, ".glb")
 
     // create a built-in "ground" shape;
