@@ -89,7 +89,7 @@ function createScene() {
                 })
             }
         }
-        slime.action.attackFall._.onAnimationEndObservable.addOnce(loop("fallToStand"))
+        slime.action.attackFall._.onAnimationEndObservable.addOnce(loop("attackFall"))
         slime.action.attackFall._.start()
     }, null, null, ".glb")
 
