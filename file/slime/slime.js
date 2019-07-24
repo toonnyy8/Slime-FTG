@@ -81,6 +81,16 @@ export let action = {
         start: 481,
         end: 540,
         _: null
+    },
+    attackFall: {
+        start: 541,
+        end: 560,
+        _: null
+    },
+    fallToStand: {
+        start: 561,
+        end: 590,
+        _: null
     }
 }
 export let url = URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime/slime.glb')]))

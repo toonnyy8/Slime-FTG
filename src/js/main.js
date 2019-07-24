@@ -73,16 +73,24 @@ function createScene() {
         slime.action.attackWeightySquat._ = animationGroup.clone()
         slime.action.attackWeightySquat._.normalize(slime.action.attackWeightySquat.start / slime.fps, slime.action.attackWeightySquat.end / slime.fps)
 
-        let loop = () => {
-            setTimeout(() => {
-                slime.action.attackWeightySquat._.stop()
-                slime.action.attackWeightySquat._.start()
-                slime.action.attackWeightySquat._.onAnimationEndObservable.addOnce(loop)
-                console.log(1)
-            })
+        slime.action.attackFall._ = animationGroup.clone()
+        slime.action.attackFall._.normalize(slime.action.attackFall.start / slime.fps, slime.action.attackFall.end / slime.fps)
+
+        slime.action.fallToStand._ = animationGroup.clone()
+        slime.action.fallToStand._.normalize(slime.action.fallToStand.start / slime.fps, slime.action.fallToStand.end / slime.fps)
+
+        let loop = (actionKey) => {
+            return () => {
+                setTimeout(() => {
+                    slime.action[actionKey]._.stop()
+                    slime.action[actionKey]._.start()
+                    slime.action[actionKey]._.onAnimationEndObservable.addOnce(loop(actionKey))
+                    console.log(1)
+                })
+            }
         }
-        slime.action.attackWeightySquat._.onAnimationEndObservable.addOnce(loop)
-        slime.action.attackWeightySquat._.start()
+        slime.action.attackFall._.onAnimationEndObservable.addOnce(loop("fallToStand"))
+        slime.action.attackFall._.start()
     }, null, null, ".glb")
 
     // create a built-in "ground" shape;
