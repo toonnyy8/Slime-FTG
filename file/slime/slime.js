@@ -99,7 +99,8 @@ export let action = {
 export let url = URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime/slime.glb')]))
 
 export class Actor {
-    constructor() {
+    constructor(animationGroup, fps) {
+        this._fps = fps && !Number.isNaN(fps - 0) ? fps : this.fps
 
     }
     static action() {
@@ -404,7 +405,7 @@ export class Actor {
     static url() {
         return URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime/slime.glb')]))
     }
-    static fps() {
+    get fps() {
         return this._fps || 60
     }
 }

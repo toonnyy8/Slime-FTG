@@ -4,8 +4,6 @@ import * as BABYLON from './babylon-module'
 
 import * as slime from "../../file/slime/slime.js"
 
-console.log(slime.Actor.fps())
-
 // Get the canvas DOM element
 let canvas = document.getElementById('bobylonCanvas')
     // Load the 3D engine
@@ -33,6 +31,7 @@ function createScene() {
         console.log(meshes)
         console.log(animationGroups)
         animationGroup = animationGroups[0] //.start(false)
+        console.log(new slime.Actor(animationGroup).fps)
 
         slime.action.stand._ = animationGroup.clone()
         slime.action.stand._.normalize(slime.action.stand.start / slime.fps, slime.action.stand.end / slime.fps)
