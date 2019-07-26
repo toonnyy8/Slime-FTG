@@ -4,24 +4,24 @@ import * as BABYLON from './babylon-module'
 
 import * as slime from "../../file/slime/slime.js"
 
-console.log(slime)
+console.log(slime.Actor.fps())
 
 // Get the canvas DOM element
 let canvas = document.getElementById('bobylonCanvas')
-// Load the 3D engine
+    // Load the 3D engine
 let engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true })
-// CreateScene function that creates and return the scene
+    // CreateScene function that creates and return the scene
 function createScene() {
 
     // This creates a basic Babylon Scene object (non-mesh)
     let scene = new BABYLON.Scene(engine)
-    //Adding an Arc Rotate Camera
+        //Adding an Arc Rotate Camera
     let camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 10, new BABYLON.Vector3(0, 0, 0), scene)
-    // target the camera to scene origin
+        // target the camera to scene origin
     camera.setTarget(BABYLON.Vector3.Zero());
     // attach the camera to the canvas
     camera.attachControl(canvas, false)
-    //Adding a light
+        //Adding a light
     let light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 5, 0), scene);
 
     let animationGroup
@@ -101,13 +101,12 @@ function createScene() {
 }
 // call the createScene function
 let scene = createScene()
-// run the render loop
+    // run the render loop
 engine.runRenderLoop(() => {
-    scene.render()
+        scene.render()
 
-})
-// the canvas/window resize event handler
+    })
+    // the canvas/window resize event handler
 window.addEventListener('resize', () => {
     engine.resize()
 })
-
