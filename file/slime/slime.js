@@ -110,12 +110,12 @@ export class Actor {
                     end: 40,
                     atk: 0
                 }],
-                forward: [{
+                standForward: [{
                     start: 41,
                     end: 70,
                     atk: 0
                 }],
-                backward: [{
+                standBackward: [{
                     start: 71,
                     end: 100,
                     atk: 0
@@ -137,13 +137,31 @@ export class Actor {
                     }
                 ],
                 squat: [{
-                        start: 351,
-                        end: 370,
+                        start: 801,
+                        end: 820,
                         atk: 0
                     },
-                    {},
-                    {},
+                    {
+                        start: 821,
+                        end: 880,
+                        atk: 0
+                    },
+                    {
+                        start: 1101,
+                        end: 1120,
+                        atk: 0
+                    },
                 ],
+                squatForward: [{
+                    start: 881,
+                    end: 920,
+                    atk: 0
+                }],
+                squatBackward: [{
+                    start: 921,
+                    end: 960,
+                    atk: 0
+                }],
                 attackFall: [{}, {}]
             },
             attack: {
@@ -235,9 +253,45 @@ export class Actor {
                     }]
                 },
                 squat: {
-                    small: [{}, {}, {}],
-                    medium: [{}, {}, {}],
-                    large: [{}, {}, {}]
+                    small: [{
+                        start: 961,
+                        end: 970,
+                        atk: 0
+                    }, {
+                        start: 970,
+                        end: 985,
+                        atk: 100
+                    }, {
+                        start: 985,
+                        end: 1000,
+                        atk: 0
+                    }],
+                    medium: [{
+                        start: 1001,
+                        end: 1018,
+                        atk: 250
+                    }, {
+                        start: 1018,
+                        end: 1030,
+                        atk: 0
+                    }, {
+                        start: 1030,
+                        end: 1040,
+                        atk: 0
+                    }],
+                    large: [{
+                        start: 1041,
+                        end: 1058,
+                        atk: 500
+                    }, {
+                        start: 1058,
+                        end: 1071,
+                        atk: 0
+                    }, {
+                        start: 1071,
+                        end: 1100,
+                        atk: 0
+                    }]
                 }
             },
             defense: {
@@ -260,7 +314,13 @@ export class Actor {
                     atk: 0
                 }],
                 squat: [{
-
+                    start: 1121,
+                    end: 1130,
+                    atk: 0
+                }, {
+                    start: 1130,
+                    end: 1140,
+                    atk: 0
                 }]
             },
             hitRecover: {
@@ -305,9 +365,38 @@ export class Actor {
                     }]
                 },
                 squat: {
-                    small: [{}, {}, {}],
-                    medium: [{}, {}, {}],
-                    large: [{}, {}, {}]
+                    small: [{
+                        start: 1141,
+                        end: 1150,
+                        atk: 0
+                    }, {
+                        start: 1150,
+                        end: 1160,
+                        atk: 0
+                    }],
+                    medium: [{
+                        start: 1161,
+                        end: 1175,
+                        atk: 0
+                    }, {
+                        start: 1175,
+                        end: 1190,
+                        atk: 0
+                    }],
+                    large: [{
+                        start: 1191,
+                        end: 1210,
+                        atk: 0
+                    }, {
+                        start: 1210,
+                        end: 1230,
+                        atk: 0
+                    }]
+                },
+                reStand: {
+                    start: 1301,
+                    end: 1330,
+                    atk: 0
                 }
             }
         }
