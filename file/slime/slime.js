@@ -219,6 +219,19 @@ export class Actor {
                         start: 555,
                         end: 570,
                         atk: 0
+                    }],
+                    fall: [{
+                        start: 571,
+                        end: 580,
+                        atk: 50
+                    }, {
+                        start: 581,
+                        end: 600,
+                        atk: 50
+                    }, {
+                        start: 601,
+                        end: 630,
+                        atk: 0
                     }]
                 },
                 squat: {
@@ -238,7 +251,13 @@ export class Actor {
                     atk: 0
                 }],
                 jump: [{
-
+                    start: 631,
+                    end: 640,
+                    atk: 0
+                }, {
+                    start: 640,
+                    end: 650,
+                    atk: 0
                 }],
                 squat: [{
 
@@ -275,9 +294,15 @@ export class Actor {
                     }]
                 },
                 jump: {
-                    small: [{}, {}, {}],
-                    medium: [{}, {}, {}],
-                    large: [{}, {}, {}]
+                    large: [{
+                        start: 651,
+                        end: 680,
+                        atk: 0
+                    }, {
+                        start: 680,
+                        end: 700,
+                        atk: 0
+                    }]
                 },
                 squat: {
                     small: [{}, {}, {}],
