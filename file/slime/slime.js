@@ -146,6 +146,40 @@ export class Actor {
                     break;
             }
         }, false)
+        document.addEventListener('keyup', (event) => {
+            switch (event.key) {
+                case keySet.forward: {
+                    console.log("forward")
+                    break;
+                }
+                case keySet.backward: {
+                    console.log("backward")
+                    break;
+                }
+                case keySet.jump: {
+                    console.log("jump")
+                    break;
+                }
+                case keySet.squat: {
+                    console.log("squat")
+                    break;
+                }
+                case keySet.attack.small: {
+                    console.log("attacksmall")
+                    break;
+                }
+                case keySet.attack.medium: {
+                    console.log("attackmedium")
+                    break;
+                }
+                case keySet.attack.large: {
+                    console.log("attacklarge")
+                    break;
+                }
+                default:
+                    break;
+            }
+        }, false)
 
 
     }
@@ -487,6 +521,9 @@ export class Actor {
         }
     }
     stopAnimation() {
+
+    }
+    tick() {
 
     }
 
