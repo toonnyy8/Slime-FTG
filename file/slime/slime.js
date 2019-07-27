@@ -99,7 +99,7 @@ export let action = {
 export let url = URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime/slime.glb')]))
 
 export class Actor {
-    constructor(mesh, animationGroup, fps, keySet = { jump: "w", squat: "s", backward: "a", forward: "d", attack: { small: "j", medium: "k", large: "l" } }) {
+    constructor({ mesh, animationGroup, keySet = { jump: "w", squat: "s", backward: "a", forward: "d", attack: { small: "j", medium: "k", large: "l" } }, fps = 60 }) {
         this._fps = fps && !Number.isNaN(fps - 0) ? fps : this.fps
         this._actions = Actor.actionSet()
         this.keyBuffer = []
@@ -112,6 +112,41 @@ export class Actor {
                 action[i].normalize(actionSetElements[i].start / this.fps, actionSetElements[i].end / this.fps)
             }
         }
+        document.addEventListener('keydown', (event) => {
+            switch (event.key) {
+                case keySet.forward: {
+                    console.log("forward")
+                    break;
+                }
+                case keySet.backward: {
+                    console.log("backward")
+                    break;
+                }
+                case keySet.jump: {
+                    console.log("jump")
+                    break;
+                }
+                case keySet.squat: {
+                    console.log("squat")
+                    break;
+                }
+                case keySet.attack.small: {
+                    console.log("attacksmall")
+                    break;
+                }
+                case keySet.attack.medium: {
+                    console.log("attackmedium")
+                    break;
+                }
+                case keySet.attack.large: {
+                    console.log("attacklarge")
+                    break;
+                }
+                default:
+                    break;
+            }
+        }, false)
+
 
     }
     static actionSet() {
@@ -418,6 +453,9 @@ export class Actor {
     get fps() {
         return this._fps || 60
     }
+    get mesh() {
+        return this._mesh
+    }
     jump() {
         if (this._mainState == "normal") {
             this._detailState = "jump"
@@ -431,9 +469,25 @@ export class Actor {
         }
     }
     forward() {
-
+        if (this._mainState == "normal") {
+            if (this._detailState == "stand") {
+                this._detailState = "standForward"
+            } else if (this._detailState == "squat") {
+                this._detailState = "squatForward"
+            }
+        }
     }
     backward() {
+        if (this._mainState == "normal") {
+            if (this._detailState == "stand") {
+                this._detailState = "standBackward"
+            } else if (this._detailState == "squat") {
+                this._detailState = "squatBackward"
+            }
+        }
+    }
+    stopAnimation() {
 
     }
+
 }
