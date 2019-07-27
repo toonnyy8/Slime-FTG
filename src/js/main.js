@@ -6,34 +6,41 @@ import * as slime from "../../file/slime/slime.js"
 
 // Get the canvas DOM element
 let canvas = document.getElementById('bobylonCanvas')
-    // Load the 3D engine
+// Load the 3D engine
 let engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true })
-    // CreateScene function that creates and return the scene
+// CreateScene function that creates and return the scene
+
 function createScene() {
 
     // This creates a basic Babylon Scene object (non-mesh)
     let scene = new BABYLON.Scene(engine)
-        //Adding an Arc Rotate Camera
-    let camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 10, new BABYLON.Vector3(0, 0, 0), scene)
-        // target the camera to scene origin
-    camera.setTarget(BABYLON.Vector3.Zero());
+    //Adding an Arc Rotate Camera
+    let camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 10, new BABYLON.Vector3(0, 3, 0), scene)
+    // target the camera to scene origin
+    camera.setTarget(new BABYLON.Vector3(0, 3, 0));
     // attach the camera to the canvas
     camera.attachControl(canvas, false)
-        //Adding a light
+    //Adding a light
     let light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 5, 0), scene);
+    light.diffuse = new BABYLON.Color3(0.9, 0.85, 0.8);
+    light.specular = new BABYLON.Color3(1, 1, 1);
+    light.groundColor = new BABYLON.Color3(0.4, 0.4, 0.5);
 
     let animationGroup
     BABYLON.SceneLoader.OnPluginActivatedObservable.addOnce(loader => {
         loader.animationStartMode = BABYLON.GLTFLoaderAnimationStartMode.NONE
     })
-    BABYLON.SceneLoader.ImportMesh("", slime.url, "", scene, (meshes, particleSystems, skeletons, animationGroups) => {
+    BABYLON.SceneLoader.ImportMesh("", slime.Actor.url(), "", scene, (meshes, particleSystems, skeletons, animationGroups) => {
         console.log(skeletons)
         console.log(meshes)
         console.log(animationGroups)
+        meshes[0].position.x = 5
+        meshes[0].position.z = -2
+
         animationGroup = animationGroups[0] //.start(false)
         console.log(new slime.Actor(animationGroup).fps)
 
-        slime.action.stand._ = animationGroup.clone()
+        /*slime.action.stand._ = animationGroup.clone()
         slime.action.stand._.normalize(slime.action.stand.start / slime.fps, slime.action.stand.end / slime.fps)
 
         slime.action.jumping._ = animationGroup.clone()
@@ -90,22 +97,59 @@ function createScene() {
         }
         slime.action.attackFall._.onAnimationEndObservable.addOnce(loop("attackFall"))
         slime.action.attackFall._.start()
+        */
+        let forward = animationGroup.clone()
+        forward.normalize(slime.Actor.actionSet().normal.standForward[0].start / slime.fps, slime.Actor.actionSet().normal.standForward[0].end / slime.fps)
+        let backward = animationGroup.clone()
+        backward.normalize(slime.Actor.actionSet().normal.standBackward[0].start / slime.fps, slime.Actor.actionSet().normal.standBackward[0].end / slime.fps)
+        let faceTo = -1
+        forward.start(true)
+        engine.runRenderLoop(() => {
+            if (meshes[0].position.x > 5) {
+                faceTo *= -1
+                backward.stop()
+                forward.start(true)
+            } else if (meshes[0].position.x < -5) {
+                faceTo *= -1
+                forward.stop()
+                backward.start(true)
+            }
+            meshes[0].movePOV(0.05 * faceTo, 0, 0)
+        })
     }, null, null, ".glb")
 
     // create a built-in "ground" shape;
-    // var ground = BABYLON.Mesh.CreateGround('ground1', 6, 6, 2, scene);
+    var ground = BABYLON.Mesh.CreateGround('ground1', 60, 20, 2, scene);
 
     return scene
 
 }
 // call the createScene function
 let scene = createScene()
-    // run the render loop
+// run the render loop
 engine.runRenderLoop(() => {
-        scene.render()
-
-    })
-    // the canvas/window resize event handler
+    scene.render()
+})
+// the canvas/window resize event handler
 window.addEventListener('resize', () => {
     engine.resize()
 })
+
+document.addEventListener('keydown', onkeydown, false);
+function onkeydown(event) {
+    console.log(event)
+}
+window.onresize = (e) => {
+    if (document.body.offsetWidth / document.body.offsetHeight > 1920 / 1080) {
+        canvas.style = "height:100%"
+    }
+    else {
+        canvas.style = "width:100%"
+    }
+}
+if (document.body.offsetWidth / document.body.offsetHeight > 1920 / 1080) {
+    canvas.style = "height:100%"
+}
+else {
+    canvas.style = "width:100%"
+}

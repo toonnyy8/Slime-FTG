@@ -99,11 +99,22 @@ export let action = {
 export let url = URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime/slime.glb')]))
 
 export class Actor {
-    constructor(animationGroup, fps) {
+    constructor(mesh, animationGroup, fps, keySet = { jump: "w", squat: "s", backward: "a", forward: "d", attack: { small: "j", medium: "k", large: "l" } }) {
         this._fps = fps && !Number.isNaN(fps - 0) ? fps : this.fps
+        this._actions = Actor.actionSet()
+        this.keyBuffer = []
+        this._mainState = "normal"
+        this._detailState = "stand"
+        this._mesh = mesh
+        let bindAction = (action, actionSetElements) => {
+            for (let i = 0; i < actionSetElements.length; i++) {
+                action[i] = animationGroup.clone()
+                action[i].normalize(actionSetElements[i].start / this.fps, actionSetElements[i].end / this.fps)
+            }
+        }
 
     }
-    static action() {
+    static actionSet() {
         return {
             normal: {
                 stand: [{
@@ -122,36 +133,36 @@ export class Actor {
                     atk: 0
                 }],
                 jump: [{
-                        start: 401,
-                        end: 410,
-                        atk: 0
-                    },
-                    {
-                        start: 411,
-                        end: 430,
-                        atk: 0
-                    },
-                    {
-                        start: 431,
-                        end: 440,
-                        atk: 0
-                    }
+                    start: 401,
+                    end: 410,
+                    atk: 0
+                },
+                {
+                    start: 411,
+                    end: 430,
+                    atk: 0
+                },
+                {
+                    start: 431,
+                    end: 440,
+                    atk: 0
+                }
                 ],
                 squat: [{
-                        start: 801,
-                        end: 820,
-                        atk: 0
-                    },
-                    {
-                        start: 821,
-                        end: 880,
-                        atk: 0
-                    },
-                    {
-                        start: 1101,
-                        end: 1120,
-                        atk: 0
-                    },
+                    start: 801,
+                    end: 820,
+                    atk: 0
+                },
+                {
+                    start: 821,
+                    end: 880,
+                    atk: 0
+                },
+                {
+                    start: 1101,
+                    end: 1120,
+                    atk: 0
+                },
                 ],
                 squatForward: [{
                     start: 881,
@@ -162,8 +173,7 @@ export class Actor {
                     start: 921,
                     end: 960,
                     atk: 0
-                }],
-                attackFall: [{}, {}]
+                }]
             },
             attack: {
                 stand: {
@@ -394,18 +404,36 @@ export class Actor {
                         atk: 0
                     }]
                 },
-                reStand: {
+                reStand: [{
                     start: 1301,
                     end: 1330,
                     atk: 0
-                }
+                }]
             }
         }
     }
     static url() {
-        return URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime/slime.glb')]))
+        return URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime/slime2.glb')]))
     }
     get fps() {
         return this._fps || 60
+    }
+    jump() {
+        if (this._mainState == "normal") {
+            this._detailState = "jump"
+        }
+    }
+    squat() {
+        if (this._mainState == "normal") {
+            if (this._detailState != "jump") {
+                this._detailState = "squat"
+            }
+        }
+    }
+    forward() {
+
+    }
+    backward() {
+
     }
 }
