@@ -15,9 +15,9 @@ function createScene() {
     // This creates a basic Babylon Scene object (non-mesh)
     let scene = new BABYLON.Scene(engine)
     //Adding an Arc Rotate Camera
-    let camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 10, new BABYLON.Vector3(0, 3, 0), scene)
+    let camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 15, new BABYLON.Vector3(0, 5, 0), scene)
     // target the camera to scene origin
-    camera.setTarget(new BABYLON.Vector3(0, 3, 0));
+    camera.setTarget(new BABYLON.Vector3(0, 5, 0));
     // attach the camera to the canvas
     camera.attachControl(canvas, false)
     //Adding a light
@@ -39,46 +39,7 @@ function createScene() {
 
         let animationGroup = animationGroups[0] //.start(false)
         player1 = new slime.Actor({ mesh: meshes[0], animationGroup: animationGroups[0] })
-        player1.mesh.position.x = 5
-        player1.mesh.position.z = -2
-        engine.runRenderLoop(() => {
-            player1.tick()
-        })
-        /*
-        slime.action.attackFall._ = animationGroup.clone()
-        slime.action.attackFall._.normalize(slime.action.attackFall.start / slime.fps, slime.action.attackFall.end / slime.fps)
 
-        let loop = (actionKey) => {
-            return () => {
-                setTimeout(() => {
-                    slime.action[actionKey]._.stop()
-                    slime.action[actionKey]._.start()
-                    slime.action[actionKey]._.onAnimationEndObservable.addOnce(loop(actionKey))
-                    console.log(1)
-                })
-            }
-        }
-        slime.action.attackFall._.onAnimationEndObservable.addOnce(loop("attackFall"))
-        slime.action.attackFall._.start()
-        */
-        let forward = animationGroup.clone()
-        forward.normalize(slime.Actor.actionSet().normal.standForward[0].start / slime.fps, slime.Actor.actionSet().normal.standForward[0].end / slime.fps)
-        let backward = animationGroup.clone()
-        backward.normalize(slime.Actor.actionSet().normal.standBackward[0].start / slime.fps, slime.Actor.actionSet().normal.standBackward[0].end / slime.fps)
-        let faceTo = -1.5
-        forward.start(true)
-        engine.runRenderLoop(() => {
-            if (meshes[0].position.x > 5) {
-                faceTo = -1.5
-                backward.stop()
-                forward.start(true)
-            } else if (meshes[0].position.x < -5) {
-                faceTo = 1
-                forward.stop()
-                backward.start(true)
-            }
-            meshes[0].movePOV(0.05 * faceTo, 0, 0)
-        })
         BABYLON.SceneLoader.ImportMesh("", slime.Actor.url(), "", scene, (meshes, particleSystems, skeletons, animationGroups) => {
             console.log(skeletons)
             console.log(meshes)
@@ -87,10 +48,25 @@ function createScene() {
             // meshes[0].position.z = -2
 
             let animationGroup = animationGroups[0] //.start(false)
-            player2 = new slime.Actor({ mesh: meshes[0], animationGroup: animationGroups[0] })
+            player2 = new slime.Actor({
+                mesh: meshes[0], animationGroup: animationGroups[0],
+                keySet: { jump: "ArrowUp", squat: "ArrowDown", left: "ArrowLeft", right: "ArrowRight", attack: { small: "1", medium: "2", large: "3" } }
+            })
+            console.log(meshes[0].rotationQuaternion)
+
+            // player2.mesh.rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.LOCAL);
+
+            console.log(meshes[0].rotationQuaternion)
+
+            player1.mesh.position.x = 5
             player2.mesh.position.x = -5
-            player2.mesh.position.z = -2
-            player2.mesh.rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.LOCAL);
+
+            player1.setOpponent(player2)
+            player2.setOpponent(player1)
+
+            engine.runRenderLoop(() => {
+                player1.tick()
+            })
             engine.runRenderLoop(() => {
                 player2.tick()
             })
@@ -111,24 +87,24 @@ function createScene() {
             slime.action.attackFall._.onAnimationEndObservable.addOnce(loop("attackFall"))
             slime.action.attackFall._.start()
             */
-            let forward = animationGroup.clone()
-            forward.normalize(slime.Actor.actionSet().normal.standForward[0].start / slime.fps, slime.Actor.actionSet().normal.standForward[0].end / slime.fps)
-            let backward = animationGroup.clone()
-            backward.normalize(slime.Actor.actionSet().normal.standBackward[0].start / slime.fps, slime.Actor.actionSet().normal.standBackward[0].end / slime.fps)
-            let faceTo = -1.5
-            forward.start(true)
-            engine.runRenderLoop(() => {
-                if (meshes[0].position.x < -5) {
-                    faceTo = -1.5
-                    backward.stop()
-                    forward.start(true)
-                } else if (meshes[0].position.x > 5) {
-                    faceTo = 1
-                    forward.stop()
-                    backward.start(true)
-                }
-                meshes[0].movePOV(0.05 * faceTo, 0, 0)
-            })
+            // let forward = animationGroup.clone()
+            // forward.normalize(slime.Actor.actionSet().normal.standForward[0].start / slime.fps, slime.Actor.actionSet().normal.standForward[0].end / slime.fps)
+            // let backward = animationGroup.clone()
+            // backward.normalize(slime.Actor.actionSet().normal.standBackward[0].start / slime.fps, slime.Actor.actionSet().normal.standBackward[0].end / slime.fps)
+            // let faceTo = -1.5
+            // forward.start(true)
+            // engine.runRenderLoop(() => {
+            //     if (meshes[0].position.x == -11) {
+            //         faceTo = -1.5
+            //         backward.stop()
+            //         forward.start(true)
+            //     } else if (meshes[0].position.x == 11) {
+            //         faceTo = 1
+            //         forward.stop()
+            //         backward.start(true)
+            //     }
+            //     meshes[0].position.x -= 0.05 * faceTo
+            // })
         }, null, null, ".glb")
     }, null, null, ".glb")
 

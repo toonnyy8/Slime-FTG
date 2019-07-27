@@ -99,46 +99,87 @@ export let action = {
 export let url = URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime/slime.glb')]))
 
 export class Actor {
-    constructor({ mesh, animationGroup, keySet = { jump: "w", squat: "s", backward: "a", forward: "d", attack: { small: "j", medium: "k", large: "l" } }, fps = 60 }) {
+    constructor({ mesh, animationGroup, keySet = { jump: "w", squat: "s", left: "a", right: "d", attack: { small: "j", medium: "k", large: "l" } }, fps = 60 }) {
         this._fps = fps && !Number.isNaN(fps - 0) ? fps : this.fps
         this._actions = Actor.actionSet()
         this.keyBuffer = []
         this._mainState = "normal"
         this._detailState = "stand"
         this._mesh = mesh
-        let bindAction = (action, actionSetElements) => {
+        this._opponent = null
+        this.keyDown = {
+            jump: false,
+            squat: false,
+            left: false,
+            right: false,
+            attack: {
+                small: false,
+                medium: false,
+                large: false
+            }
+        }
+        let bindAction = (actionSetElements) => {
+            let action = []
             for (let i = 0; i < actionSetElements.length; i++) {
                 action[i] = animationGroup.clone()
                 action[i].normalize(actionSetElements[i].start / this.fps, actionSetElements[i].end / this.fps)
             }
+            return action
         }
+        this._actions.normal.stand = bindAction(Actor.actionSet().normal.stand)
+        this._actions.normal.stand[0].start(true)
+
+        this._actions.normal.standForward = bindAction(Actor.actionSet().normal.standForward)
+        this._actions.normal.standBackward = bindAction(Actor.actionSet().normal.standBackward)
+
+        this._actions.normal.squat = bindAction(Actor.actionSet().normal.squat)
+        this._actions.normal.squatForward = bindAction(Actor.actionSet().normal.squatForward)
+        this._actions.normal.squatBackward = bindAction(Actor.actionSet().normal.squatBackward)
+
+        this._actions.normal.jump = bindAction(Actor.actionSet().normal.jump)
+
+
         document.addEventListener('keydown', (event) => {
+            // console.log(event.key)
+
             switch (event.key) {
-                case keySet.forward: {
-                    console.log("forward")
+                case keySet.right: {
+                    if (!this.keyDown.right) {
+                        if (this._mainState == "normal") {
+                            this._detailState = "jump"
+                        }
+                        console.log("right")
+                    }
+                    this.keyDown.right = true
                     break;
                 }
-                case keySet.backward: {
-                    console.log("backward")
+                case keySet.left: {
+                    this.keyDown.left = true
+                    console.log("left")
                     break;
                 }
                 case keySet.jump: {
+                    this.keyDown.jump = true
                     console.log("jump")
                     break;
                 }
                 case keySet.squat: {
+                    this.keyDown.squat = true
                     console.log("squat")
                     break;
                 }
                 case keySet.attack.small: {
+                    this.keyDown.attack.small = true
                     console.log("attacksmall")
                     break;
                 }
                 case keySet.attack.medium: {
+                    this.keyDown.attack.medium = true
                     console.log("attackmedium")
                     break;
                 }
                 case keySet.attack.large: {
+                    this.keyDown.attack.large = true
                     console.log("attacklarge")
                     break;
                 }
@@ -148,31 +189,38 @@ export class Actor {
         }, false)
         document.addEventListener('keyup', (event) => {
             switch (event.key) {
-                case keySet.forward: {
-                    console.log("forward")
+                case keySet.right: {
+                    if (this.keyDown.right) { }
+                    this.keyDown.right = false
                     break;
                 }
-                case keySet.backward: {
-                    console.log("backward")
+                case keySet.left: {
+                    this.keyDown.left = false
+                    console.log("left")
                     break;
                 }
                 case keySet.jump: {
+                    this.keyDown.jump = false
                     console.log("jump")
                     break;
                 }
                 case keySet.squat: {
+                    this.keyDown.squat = false
                     console.log("squat")
                     break;
                 }
                 case keySet.attack.small: {
+                    this.keyDown.attack.small = false
                     console.log("attacksmall")
                     break;
                 }
                 case keySet.attack.medium: {
+                    this.keyDown.attack.medium = false
                     console.log("attackmedium")
                     break;
                 }
                 case keySet.attack.large: {
+                    this.keyDown.attack.large = false
                     console.log("attacklarge")
                     break;
                 }
@@ -524,7 +572,36 @@ export class Actor {
 
     }
     tick() {
+        if (this.mesh.position.x > 11) { this.mesh.position.x = 11 }
+        if (this.mesh.position.x < - 11) { this.mesh.position.x = -11 }
+        this._actions.normal.stand[0].start(true)
+        switch (this.faceTo) {
+            case "left": {
+                // console.log(this.mesh.rotationQuaternion)
+                if (this.mesh.rotationQuaternion.w != -1) {
+                    this.mesh.rotate(BABYLON.Axis.Y, Math.PI / 3, BABYLON.Space.LOCAL);
+                    console.log(this.mesh.rotationQuaternion)
+                }
+                // 
+                break;
+            }
+            case "right": {
+                // this.mesh.rotate(BABYLON.Axis.Y, 0, BABYLON.Space.LOCAL);
 
+                break;
+            }
+            default:
+                break;
+        }
+        console.log(this.faceTo)
     }
-
+    setOpponent(opponent) {
+        this._opponent = opponent
+    }
+    get opponent() {
+        return this._opponent
+    }
+    get faceTo() {
+        return this.opponent.mesh.position.x > this.mesh.position.x ? "left" : "right"
+    }
 }
