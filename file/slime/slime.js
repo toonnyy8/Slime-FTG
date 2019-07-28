@@ -23,16 +23,17 @@ export class Actor {
                 large: false
             }
         }
+        this.jumpTimes = 0
+
         this.vector = BABYLON.Vector3.Zero()
-        this._preFaceTo = null
 
         Object.keys(this._actions).forEach(chapter => {
             Object.keys(this._actions[chapter]).forEach(section => {
                 Object.keys(this._actions[chapter][section]).forEach(subsection => {
-                    this._actions[chapter][section][subsection].forEach((anim, index, animsArray) => {
-                        animsArray[index] = animationGroup.clone()
-                        // console.log(`${chapter}:${section}:${subsection}:${index}`)
-                        animsArray[index].normalize(Actor.actionSet()[chapter][section][subsection][index].start / this.fps, Actor.actionSet()[chapter][section][subsection][index].end / this.fps)
+                    this._actions[chapter][section][subsection].forEach((anim, subsubsection, animsArray) => {
+                        animsArray[subsubsection] = animationGroup.clone()
+                        // console.log(`${chapter}:${section}:${subsection}:${subsubsection}`)
+                        animsArray[subsubsection].normalize(Actor.actionSet()[chapter][section][subsection][subsubsection].start / this.fps, Actor.actionSet()[chapter][section][subsection][subsubsection].end / this.fps)
                     })
                     switch (chapter) {
                         case "normal": {
@@ -40,9 +41,35 @@ export class Actor {
                                 case "squat": {
                                     switch (subsection) {
                                         case "main": {
-                                            this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
-                                                this._state.subsubsection = 1
-                                            })
+                                            // this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
+                                            //     if (this._state.section == "squat") {
+                                            //         this._state.subsubsection = 1
+                                            //     }
+                                            // })
+                                            // this._actions[chapter][section][subsection][2].onAnimationEndObservable.add(() => {
+                                            //     this._state.subsubsection = 0
+                                            //     this._state.section = "stand"
+                                            // })
+                                            break;
+                                        }
+                                        default:
+                                            break;
+                                    }
+                                    break;
+                                    break;
+                                }
+                                case "jump": {
+                                    switch (subsection) {
+                                        case "main": {
+                                            // this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
+                                            //     if (this._state.section == "jump") {
+                                            //         this._state.subsubsection = 1
+                                            //     }
+                                            // })
+                                            // this._actions[chapter][section][subsection][2].onAnimationEndObservable.add(() => {
+                                            //     this._state.subsubsection = 0
+                                            //     this._state.section = "stand"
+                                            // })
                                             break;
                                         }
                                         default:
@@ -89,12 +116,15 @@ export class Actor {
                     break;
                 }
                 case keySet.jump: {
-                    if (!this.keyDown.jump) {
+                    if (!this.keyDown.jump && this.jumpTimes < 2) {
                         if (this._state.chapter == "normal") {
                             this._state.section = "jump"
+                            this._state.subsection = "main"
+                            this._state.subsubsection = 0
                             this.keyDown.jump = true
                             this.vector.y = 0.5
                             this.mesh.position.y += 0.01
+                            this.jumpTimes += 1
                         }
                     }
                     break;
@@ -104,8 +134,8 @@ export class Actor {
                         if (this._state.chapter == "normal") {
                             if (this._state.section != "jump") {
                                 this._state.section = "squat"
-                                this.keyDown.squat = true
                             }
+                            this.keyDown.squat = true
                         }
                     }
                     break;
@@ -132,12 +162,18 @@ export class Actor {
                     if (this.keyDown.right) {
                         this._state.subsection = "main"
                     }
+                    if (this.keyDown.left) {
+                        this._state.subsection = this.faceTo == "left" ? "forward" : "backward"
+                    }
                     this.keyDown.right = false
                     break;
                 }
                 case keySet.left: {
                     if (this.keyDown.left) {
                         this._state.subsection = "main"
+                    }
+                    if (this.keyDown.right) {
+                        this._state.subsection = this.faceTo == "right" ? "forward" : "backward"
                     }
                     this.keyDown.left = false
                     break;
@@ -148,7 +184,10 @@ export class Actor {
                 }
                 case keySet.squat: {
                     if (this.keyDown.squat) {
-                        this._state.section = "stand"
+                        if (this._state.section != "jump") {
+                            this._state.section = "stand"
+                            this._state.subsubsection = 0
+                        }
                     }
                     this.keyDown.squat = false
                     break;
@@ -193,38 +232,42 @@ export class Actor {
                     }]
                 },
                 jump: {
-                    main: [{
-                        start: 401,
-                        end: 410,
-                        atk: 0
-                    },
-                    {
-                        start: 411,
-                        end: 430,
-                        atk: 0
-                    },
-                    {
-                        start: 431,
-                        end: 440,
-                        atk: 0
-                    }]
+                    main: [
+                        //     {
+                        //     start: 401,
+                        //     end: 410,
+                        //     atk: 0
+                        // },
+                        {
+                            start: 411,
+                            end: 430,
+                            atk: 0
+                        },
+                        // {
+                        //     start: 431,
+                        //     end: 440,
+                        //     atk: 0
+                        // }
+                    ]
                 },
                 squat: {
-                    main: [{
-                        start: 801,
-                        end: 820,
-                        atk: 0
-                    },
-                    {
-                        start: 821,
-                        end: 880,
-                        atk: 0
-                    },
-                    {
-                        start: 1101,
-                        end: 1120,
-                        atk: 0
-                    }],
+                    main: [
+                        //     {
+                        //     start: 801,
+                        //     end: 820,
+                        //     atk: 0
+                        // },
+                        {
+                            start: 821,
+                            end: 880,
+                            atk: 0
+                        },
+                        // {
+                        //     start: 1101,
+                        //     end: 1120,
+                        //     atk: 0
+                        // }
+                    ],
                     forward: [{
                         start: 881,
                         end: 920,
@@ -491,54 +534,25 @@ export class Actor {
     get mesh() {
         return this._mesh
     }
-    jump() {
-        if (this._mainState == "normal") {
-            this._detailState = "jump"
-        }
-    }
-    squat() {
-        if (this._mainState == "normal") {
-            if (this._detailState != "jump") {
-                this._detailState = "squat"
-            }
-        }
-    }
-    forward() {
-        if (this._mainState == "normal") {
-            if (this._detailState == "stand") {
-                this._detailState = "standForward"
-            } else if (this._detailState == "squat") {
-                this._detailState = "squatForward"
-            }
-        }
-    }
-    backward() {
-        if (this._mainState == "normal") {
-            if (this._detailState == "stand") {
-                this._detailState = "standBackward"
-            } else if (this._detailState == "squat") {
-                this._detailState = "squatBackward"
-            }
-        }
-    }
+
     stopAnimation() {
         Object.keys(this._actions).forEach((chapter => {
             Object.keys(this._actions[chapter]).forEach((section => {
                 Object.keys(this._actions[chapter][section]).forEach((subsection => {
-                    if (`${chapter}:${section}:${subsection}` != `${this._state["chapter"]}:${this._state["section"]}:${this._state["subsection"]}`) {
-                        this._actions[chapter][section][subsection].forEach(anim => {
+                    this._actions[chapter][section][subsection].forEach((anim, subsubsection) => {
+                        if (`${chapter}:${section}:${subsection}:${subsubsection}` != `${this._state["chapter"]}:${this._state["section"]}:${this._state["subsection"]}:${this._state["subsubsection"]}`) {
                             anim.stop()
-                        })
-                    } else { }
+                        } else { }
+                    })
                 }))
             }))
         }))
-
     }
+
     tick() {
         // console.log(this._detailState)
         this.stopAnimation()
-        this._actions[this._state.chapter][this._state.section][this._state.subsection][0].start(true)
+        this._actions[this._state.chapter][this._state.section][this._state.subsection][this._state.subsubsection].start()
         if (`${this._state["chapter"]}:${this._state["section"]}:${this._state["subsection"]}` == "normal:stand:main") {
             this.vector = BABYLON.Vector3.Zero()
         }
@@ -552,9 +566,16 @@ export class Actor {
                         break;
                     }
                     case "jump": {
-                        if (this.mesh.position.x <= 0) {
-                            this.mesh.position.x = 0
-                            this._state.section = "stand"
+                        if (this.mesh.position.y <= 0) {
+                            this.mesh.position.y = 0
+                            this.jumpTimes = 0
+                            if (this.keyDown.squat) {
+                                this._state.section = "squat"
+                            } else {
+                                this._state.section = "stand"
+                            }
+                            // this.vector.x = 0
+                            // this._state.subsubsection = 2
                         }
                         break;
                     }
@@ -563,20 +584,36 @@ export class Actor {
                 }
                 break;
             }
-
             default:
                 break;
         }
-
-
-
-        if (this.keyDown.left) {
-            this.vector.x = this.faceTo == "left" ? 0.1 : 0.075
+        if (this._state.chapter == "normal" && this._state.section != "jump") {
+            if (this.keyDown.right && this.keyDown.left) {
+                this._state.subsection = "main"
+            } else {
+                if (this.keyDown.left) {
+                    if (this.faceTo == "left") {
+                        this._state.subsection = "forward"
+                    } else {
+                        this._state.subsection = "backward"
+                    }
+                }
+                else if (this.keyDown.right) {
+                    if (this.faceTo == "right") {
+                        this._state.subsection = "forward"
+                    } else {
+                        this._state.subsection = "backward"
+                    }
+                }
+            }
         }
-        if (this.keyDown.right) {
-            this.vector.x = this.faceTo == "right" ? -0.1 : -0.075
+        if (this._state.subsection == "forward") {
+            this.vector.x = this.faceTo == "right" ? -0.1 : 0.1
+        } else if (this._state.subsection == "backward") {
+            this.vector.x = this.faceTo == "left" ? - 0.075 : 0.075
         }
-        if (this.keyDown.squat) {
+
+        if (this._state.section == "squat") {
             this.vector.x *= 0.5
         }
         if (this.mesh.position.y > 0) {
@@ -591,68 +628,13 @@ export class Actor {
         if (this.mesh.position.x < - 11) { this.mesh.position.x = -11 }
 
 
-
-        if (this.faceTo != this._preFaceTo) {
-            if (this._state.chapter == "normal" && this._state.section != "jump") {
-                if (this.faceTo == "left") {
-                    this.mesh.rotationQuaternion = new BABYLON.Vector3(0, 0, 0).toQuaternion()
-                } else {
-                    this.mesh.rotationQuaternion = new BABYLON.Vector3(0, Math.PI, 0).toQuaternion()
-                }
+        if (this._state.chapter == "normal" && this._state.section != "jump") {
+            if (this.faceTo == "left") {
+                this.mesh.rotationQuaternion = new BABYLON.Vector3(0, 0, 0).toQuaternion()
+            } else {
+                this.mesh.rotationQuaternion = new BABYLON.Vector3(0, Math.PI, 0).toQuaternion()
             }
-            switch (this._state.subsection) {
-                case "forward": {
-                    this._state.subsection = "backward"
-                    break;
-                }
-                case "backward": {
-                    this._state.subsection = "forward"
-                    break;
-                }
-                default: {
-                    break;
-                }
-            }
-            // switch (this._state.chapter) {
-            //     case "normal": {
-            //         switch (this._state.section) {
-            //             case "stand": {
-            //                 switch (this._state.subsection) {
-            //                     case "forward": {
-            //                         this._state.subsection = "backward"
-            //                         break;
-            //                     }
-            //                     case "backward": {
-            //                         this._state.subsection = "forward"
-            //                         break;
-            //                     }
-            //                     default: {
-            //                         break;
-            //                     }
-            //                 }
-            //                 break;
-            //             }
-            //             case "squat": {
-
-            //                 break;
-            //             }
-            //             case "jump": {
-            //                 break;
-            //             }
-            //             default: {
-            //                 break;
-            //             }
-            //         }
-            //         break;
-            //     }
-
-            //     default: {
-            //         break;
-            //     }
-            // }
         }
-        this._preFaceTo = this.faceTo
-
     }
     setOpponent(opponent) {
         this._opponent = opponent

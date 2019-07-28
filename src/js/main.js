@@ -19,7 +19,7 @@ function createScene() {
     // target the camera to scene origin
     camera.setTarget(new BABYLON.Vector3(0, 5, 0));
     // attach the camera to the canvas
-    camera.attachControl(canvas, false)
+    // camera.attachControl(canvas, false)
     //Adding a light
     let light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 5, 0), scene);
     light.diffuse = new BABYLON.Color3(0.9, 0.85, 0.8);
@@ -38,6 +38,7 @@ function createScene() {
         // meshes[0].position.z = -2
 
         let animationGroup = animationGroups[0] //.start(false)
+        animationGroup.stop()
         player1 = new slime.Actor({ mesh: meshes[0], animationGroup: animationGroups[0] })
 
         BABYLON.SceneLoader.ImportMesh("", slime.Actor.url(), "", scene, (meshes, particleSystems, skeletons, animationGroups) => {
@@ -52,6 +53,7 @@ function createScene() {
             meshes[1].material.ambientColor = new BABYLON.Color3(0.5, 0, 0);
 
             let animationGroup = animationGroups[0] //.start(false)
+            animationGroup.stop()
             player2 = new slime.Actor({
                 mesh: meshes[0], animationGroup: animationGroups[0],
                 keySet: { jump: "ArrowUp", squat: "ArrowDown", left: "ArrowLeft", right: "ArrowRight", attack: { small: "1", medium: "2", large: "3" } }
