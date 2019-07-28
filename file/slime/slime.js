@@ -1,102 +1,6 @@
 import fs from 'fs'
 
-export let fps = 60
-
-export let action = {
-    walk: {
-        start: 1,
-        end: 30,
-        _: null
-    },
-    jumpUp: {
-        start: 31,
-        end: 40,
-        _: null
-    },
-    jumpDown: {
-        start: 41,
-        end: 50,
-        _: null
-    },
-    jumping: {
-        start: 51,
-        end: 70,
-        _: null
-    },
-    stand: {
-        start: 71,
-        end: 110,
-        _: null
-    },
-    attackLight: {
-        start: 111,
-        end: 130,
-        _: null
-    },
-    attackMedium: {
-        start: 131,
-        end: 160,
-        _: null
-    },
-    attackWeighty: {
-        start: 161,
-        end: 200,
-        _: null
-    },
-    attackLightJump: {
-        start: 201,
-        end: 220,
-        _: null
-    },
-    attackMediumJump: {
-        start: 221,
-        end: 260,
-        _: null
-    },
-    attackWeightyJump: {
-        start: 261,
-        end: 320,
-        _: null
-    },
-    crouch: {
-        start: 321,
-        end: 340,
-        _: null
-    },
-    squat: {
-        start: 341,
-        end: 400,
-        _: null
-    },
-    attackLightSquat: {
-        start: 401,
-        end: 440,
-        _: null
-    },
-    attackMediumSquat: {
-        start: 441,
-        end: 480,
-        _: null
-    },
-    attackWeightySquat: {
-        start: 481,
-        end: 540,
-        _: null
-    },
-    attackFall: {
-        start: 541,
-        end: 560,
-        _: null
-    },
-    fallToStand: {
-        start: 561,
-        end: 590,
-        _: null
-    }
-}
-
-
-export let url = URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime/slime.glb')]))
+import * as BABYLON from "babylonjs"
 
 export class Actor {
     constructor({ mesh, animationGroup, keySet = { jump: "w", squat: "s", left: "a", right: "d", attack: { small: "j", medium: "k", large: "l" } }, fps = 60 }) {
@@ -118,6 +22,8 @@ export class Actor {
                 large: false
             }
         }
+        this.vector = BABYLON.Vector3.Zero()
+        this._preFaceTo = null
         let bindAction = (actionSetElements) => {
             let action = []
             for (let i = 0; i < actionSetElements.length; i++) {
@@ -127,12 +33,13 @@ export class Actor {
             return action
         }
         this._actions.normal.stand = bindAction(Actor.actionSet().normal.stand)
-        this._actions.normal.stand[0].start(true)
-
         this._actions.normal.standForward = bindAction(Actor.actionSet().normal.standForward)
         this._actions.normal.standBackward = bindAction(Actor.actionSet().normal.standBackward)
 
         this._actions.normal.squat = bindAction(Actor.actionSet().normal.squat)
+        // this._actions.normal.squat[0].onAnimationEndObservable.add(() => {
+        //     this._actions.normal.squat[1].start(true)
+        // })
         this._actions.normal.squatForward = bindAction(Actor.actionSet().normal.squatForward)
         this._actions.normal.squatBackward = bindAction(Actor.actionSet().normal.squatBackward)
 
@@ -141,46 +48,61 @@ export class Actor {
 
         document.addEventListener('keydown', (event) => {
             // console.log(event.key)
-
             switch (event.key) {
                 case keySet.right: {
                     if (!this.keyDown.right) {
-                        if (this._mainState == "normal") {
-                            this._detailState = "jump"
+                        if (this._detailState == "stand" || this._detailState == "squat") {
+                            if (this.faceTo == "right") {
+                                this._detailState += "Forward"
+                            } else {
+                                this._detailState += "Backward"
+                            }
+                            this.keyDown.right = true
                         }
-                        console.log("right")
                     }
-                    this.keyDown.right = true
                     break;
                 }
                 case keySet.left: {
-                    this.keyDown.left = true
-                    console.log("left")
+                    if (!this.keyDown.left) {
+                        if (this._detailState == "stand" || this._detailState == "squat") {
+                            if (this.faceTo == "left") {
+                                this._detailState += "Forward"
+                            } else {
+                                this._detailState += "Backward"
+                            }
+                            this.keyDown.left = true
+                        }
+                    }
                     break;
                 }
                 case keySet.jump: {
-                    this.keyDown.jump = true
-                    console.log("jump")
+                    if (!this.keyDown.jump) {
+                        this._detailState = "jump"
+                        this.keyDown.jump = true
+                        this.vector.y = 0.5
+                        this.mesh.position.y += 0.01
+                    }
                     break;
                 }
                 case keySet.squat: {
-                    this.keyDown.squat = true
-                    console.log("squat")
+                    if (!this.keyDown.squat) {
+                        if (this._detailState != "jump") {
+                            this._detailState = "squat" + this._detailState.split("stand").pop()
+                            this.keyDown.squat = true
+                        }
+                    }
                     break;
                 }
                 case keySet.attack.small: {
                     this.keyDown.attack.small = true
-                    console.log("attacksmall")
                     break;
                 }
                 case keySet.attack.medium: {
                     this.keyDown.attack.medium = true
-                    console.log("attackmedium")
                     break;
                 }
                 case keySet.attack.large: {
                     this.keyDown.attack.large = true
-                    console.log("attacklarge")
                     break;
                 }
                 default:
@@ -190,38 +112,41 @@ export class Actor {
         document.addEventListener('keyup', (event) => {
             switch (event.key) {
                 case keySet.right: {
-                    if (this.keyDown.right) { }
+                    if (this.keyDown.right) {
+                        this._detailState = this._detailState.split("Forward")[0].split("Backward")[0]
+                    }
                     this.keyDown.right = false
                     break;
                 }
                 case keySet.left: {
+                    if (this.keyDown.left) {
+                        this._detailState = this._detailState.split("Forward")[0].split("Backward")[0]
+                    }
                     this.keyDown.left = false
-                    console.log("left")
                     break;
                 }
                 case keySet.jump: {
                     this.keyDown.jump = false
-                    console.log("jump")
                     break;
                 }
                 case keySet.squat: {
+                    if (this.keyDown.squat) {
+                        this._detailState = "stand" + this._detailState.split("squat").pop()
+                        console.log(this._detailState)
+                    }
                     this.keyDown.squat = false
-                    console.log("squat")
                     break;
                 }
                 case keySet.attack.small: {
                     this.keyDown.attack.small = false
-                    console.log("attacksmall")
                     break;
                 }
                 case keySet.attack.medium: {
                     this.keyDown.attack.medium = false
-                    console.log("attackmedium")
                     break;
                 }
                 case keySet.attack.large: {
                     this.keyDown.attack.large = false
-                    console.log("attacklarge")
                     break;
                 }
                 default:
@@ -569,31 +494,129 @@ export class Actor {
         }
     }
     stopAnimation() {
-
+        Object.keys(this._actions.normal).forEach((key) => {
+            if (key != this._detailState) {
+                this._actions.normal[key].forEach((anim) => {
+                    if (anim.isPlaying) {
+                        anim.stop()
+                        console.log(key)
+                    }
+                })
+            } else {
+                // console.log(this._actions.normal[key])
+            }
+        })
     }
     tick() {
-        if (this.mesh.position.x > 11) { this.mesh.position.x = 11 }
-        if (this.mesh.position.x < - 11) { this.mesh.position.x = -11 }
-        this._actions.normal.stand[0].start(true)
-        switch (this.faceTo) {
-            case "left": {
-                // console.log(this.mesh.rotationQuaternion)
-                if (this.mesh.rotationQuaternion.w != -1) {
-                    this.mesh.rotate(BABYLON.Axis.Y, Math.PI / 3, BABYLON.Space.LOCAL);
-                    console.log(this.mesh.rotationQuaternion)
+        // console.log(this._detailState)
+        this.stopAnimation()
+        switch (this._mainState) {
+            case "normal": {
+                switch (this._detailState) {
+                    case "stand": {
+                        this._actions.normal.stand[0].start(true)
+                        this.vector = BABYLON.Vector3.Zero()
+                        break;
+                    }
+                    case "standForward": {
+                        this._actions.normal.standForward[0].start(true)
+                        break;
+                    }
+                    case "standBackward": {
+                        this._actions.normal.standBackward[0].start(true)
+                        break;
+                    }
+                    case "squat": {
+                        this._actions.normal.squat[1].start()
+                        this.vector = BABYLON.Vector3.Zero()
+                        break;
+                    }
+                    case "squatForward": {
+                        this._actions.normal.squatForward[0].start(true)
+                        break;
+                    }
+                    case "squatBackward": {
+                        this._actions.normal.squatBackward[0].start(true)
+                        break;
+                    }
+                    case "jump": {
+                        this._actions.normal.jump[1].start(true)
+                        break;
+                    }
+                    default:
+                        break;
                 }
-                // 
                 break;
             }
-            case "right": {
-                // this.mesh.rotate(BABYLON.Axis.Y, 0, BABYLON.Space.LOCAL);
 
-                break;
-            }
             default:
                 break;
         }
-        console.log(this.faceTo)
+
+        if (this.keyDown.left) {
+            this.vector.x = this.faceTo == "left" ? 0.075 : 0.05
+        }
+        if (this.keyDown.right) {
+            this.vector.x = this.faceTo == "right" ? -0.075 : -0.05
+        }
+        if (this.keyDown.squat) {
+            this.vector.x *= 0.5
+        }
+        if (this.mesh.position.y > 0) {
+            this.vector.y -= 0.02
+        } else {
+            this.mesh.position.y = 0
+            this.vector.y = 0
+        }
+        this.mesh.position = this.mesh.position.add(this.vector)
+
+        if (this.mesh.position.x > 11) { this.mesh.position.x = 11 }
+        if (this.mesh.position.x < - 11) { this.mesh.position.x = -11 }
+
+
+
+        if (this.faceTo != this._preFaceTo) {
+            if (this._detailState != "jump") {
+                if (this.faceTo == "left") {
+                    this.mesh.rotationQuaternion = new BABYLON.Vector3(0, 0, 0).toQuaternion()
+                } else {
+                    this.mesh.rotationQuaternion = new BABYLON.Vector3(0, Math.PI, 0).toQuaternion()
+                }
+            }
+            switch (this._mainState) {
+                case "normal": {
+                    switch (this._detailState) {
+                        case "stand": {
+                            break;
+                        }
+                        case "standForward": {
+                            this._detailState = "standBackward"
+                            break;
+                        }
+                        case "standBackward": {
+                            this._detailState = "standForward"
+                            break;
+                        }
+                        case "squatForward": {
+                            this._detailState = "squatBackward"
+                            break;
+                        }
+                        case "squatBackward": {
+                            this._detailState = "squatForward"
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                    break;
+                }
+
+                default:
+                    break;
+            }
+        }
+        this._preFaceTo = this.faceTo
+
     }
     setOpponent(opponent) {
         this._opponent = opponent

@@ -46,20 +46,22 @@ function createScene() {
             console.log(animationGroups)
             // meshes[0].position.x = 5
             // meshes[0].position.z = -2
+            meshes[1].material.diffuseColor = new BABYLON.Color3(0.1, 0, 0);
+            meshes[1].material.specularColor = new BABYLON.Color3(0.5, 0, 0);
+            meshes[1].material.emissiveColor = new BABYLON.Color3(0.5, 0, 0);
+            meshes[1].material.ambientColor = new BABYLON.Color3(0.5, 0, 0);
 
             let animationGroup = animationGroups[0] //.start(false)
             player2 = new slime.Actor({
                 mesh: meshes[0], animationGroup: animationGroups[0],
                 keySet: { jump: "ArrowUp", squat: "ArrowDown", left: "ArrowLeft", right: "ArrowRight", attack: { small: "1", medium: "2", large: "3" } }
             })
-            console.log(meshes[0].rotationQuaternion)
-
-            // player2.mesh.rotate(BABYLON.Axis.Y, Math.PI, BABYLON.Space.LOCAL);
-
-            console.log(meshes[0].rotationQuaternion)
 
             player1.mesh.position.x = 5
             player2.mesh.position.x = -5
+
+            player1.mesh.rotationQuaternion = new BABYLON.Vector3(0, Math.PI, 0).toQuaternion()
+            player2.mesh.rotationQuaternion = new BABYLON.Vector3(0, 0, 0).toQuaternion()
 
             player1.setOpponent(player2)
             player2.setOpponent(player1)
@@ -110,7 +112,7 @@ function createScene() {
 
     // create a built-in "ground" shape;
     var ground = BABYLON.Mesh.CreateGround('ground1', 60, 20, 2, scene);
-
+    ground.position.y = -0.1
     return scene
 
 }
