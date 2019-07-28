@@ -72,6 +72,9 @@ function createScene() {
             engine.runRenderLoop(() => {
                 player2.tick()
             })
+            engine.runRenderLoop(() => {
+                scene.render()
+            })
             /*
             slime.action.attackFall._ = animationGroup.clone()
             slime.action.attackFall._.normalize(slime.action.attackFall.start / slime.fps, slime.action.attackFall.end / slime.fps)
@@ -119,9 +122,9 @@ function createScene() {
 // call the createScene function
 let scene = createScene()
 // run the render loop
-engine.runRenderLoop(() => {
-    scene.render()
-})
+// engine.runRenderLoop(() => {
+//     scene.render()
+// })
 // the canvas/window resize event handler
 window.addEventListener('resize', () => {
     engine.resize()
