@@ -46,11 +46,13 @@ export class Actor {
                                                 case "main":
                                                     {
                                                         this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
-                                                            if (this._state.section == "squat") {
-                                                                if (this.keyDown.squat) {
-                                                                    this._state.subsubsection = 1
-                                                                } else {
-                                                                    this._state.subsubsection = 2
+                                                            if (this._state.chapter == "normal") {
+                                                                if (this._state.section == "squat") {
+                                                                    if (this.keyDown.squat) {
+                                                                        this._state.subsubsection = 1
+                                                                    } else {
+                                                                        this._state.subsubsection = 2
+                                                                    }
                                                                 }
                                                             }
                                                         })
@@ -133,7 +135,7 @@ export class Actor {
 
                                             })
                                             this._actions[chapter][section][subsection][2].onAnimationEndObservable.add(() => {
-                                                this._state.subsubsection = 0
+                                                this._state.subsubsection = 1
                                                 this._state.chapter = "normal"
                                                 this._state.subsection = "main"
                                             })
@@ -214,6 +216,7 @@ export class Actor {
                             if (this._state.chapter == "normal") {
                                 this._state.chapter = "attack"
                                 this._state.subsection = "small"
+                                this._state.subsubsection = 0
                                 this.keyDown.attack.small = true
                             }
                         }
@@ -225,6 +228,7 @@ export class Actor {
                             if (this._state.chapter == "normal") {
                                 this._state.chapter = "attack"
                                 this._state.subsection = "medium"
+                                this._state.subsubsection = 0
                                 this.keyDown.attack.medium = true
                             }
                         }
@@ -236,6 +240,7 @@ export class Actor {
                             if (this._state.chapter == "normal") {
                                 this._state.chapter = "attack"
                                 this._state.subsection = "large"
+                                this._state.subsubsection = 0
                                 this.keyDown.attack.large = true
                             }
                         }
