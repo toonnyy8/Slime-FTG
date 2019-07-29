@@ -23,6 +23,7 @@ export class Actor {
                 large: false
             }
         }
+        this.isHit = false
         this.jumpTimes = 0
 
         this.vector = BABYLON.Vector3.Zero()
@@ -92,6 +93,37 @@ export class Actor {
                                 }
                                 break;
                             }
+                        case "attack":
+                            {
+                                switch (section) {
+                                    case "stand":
+                                        {
+                                            this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
+                                                if (this.isHit) {
+                                                    this._state.subsubsection = 1
+                                                } else {
+                                                    this._state.subsubsection = 2
+                                                }
+                                            })
+                                            this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
+
+                                                this._state.subsubsection = 2
+
+                                            })
+                                            this._actions[chapter][section][subsection][2].onAnimationEndObservable.add(() => {
+                                                this._state.subsubsection = 0
+                                                this._state.chapter = "normal"
+                                                this._state.subsection = "main"
+                                            })
+
+                                            break;
+                                        }
+
+                                    default:
+                                        break;
+                                }
+                                break;
+                            }
                         default:
                             break;
                     }
@@ -134,7 +166,7 @@ export class Actor {
                                 this._state.subsection = "main"
                                 this._state.subsubsection = 0
                                 this.keyDown.jump = true
-                                this.vector.y = 0.5
+                                this.vector.y = 0.4
                                 this.mesh.position.y += 0.01
                                 this.jumpTimes += 1
                             }
@@ -157,17 +189,35 @@ export class Actor {
                     }
                 case keySet.attack.small:
                     {
-                        this.keyDown.attack.small = true
+                        if (!this.keyDown.attack.small) {
+                            if (this._state.chapter == "normal") {
+                                this._state.chapter = "attack"
+                                this._state.subsection = "small"
+                                this.keyDown.attack.small = true
+                            }
+                        }
                         break;
                     }
                 case keySet.attack.medium:
                     {
-                        this.keyDown.attack.medium = true
+                        if (!this.keyDown.attack.medium) {
+                            if (this._state.chapter == "normal") {
+                                this._state.chapter = "attack"
+                                this._state.subsection = "medium"
+                                this.keyDown.attack.medium = true
+                            }
+                        }
                         break;
                     }
                 case keySet.attack.large:
                     {
-                        this.keyDown.attack.large = true
+                        if (!this.keyDown.attack.large) {
+                            if (this._state.chapter == "normal") {
+                                this._state.chapter = "attack"
+                                this._state.subsection = "large"
+                                this.keyDown.attack.large = true
+                            }
+                        }
                         break;
                     }
                 default:
@@ -221,6 +271,9 @@ export class Actor {
                     }
                 case keySet.attack.small:
                     {
+                        if (this.keyDown.attack.small) {
+
+                        }
                         this.keyDown.attack.small = false
                         break;
                     }
