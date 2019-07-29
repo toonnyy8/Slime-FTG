@@ -23,6 +23,7 @@ export class Actor {
                 large: false
             }
         }
+        this.jumpAttackNum = 0
         this.isHit = false
         this.jumpTimes = 0
 
@@ -33,7 +34,7 @@ export class Actor {
                 Object.keys(this._actions[chapter][section]).forEach(subsection => {
                     this._actions[chapter][section][subsection].forEach((anim, subsubsection, animsArray) => {
                         animsArray[subsubsection] = animationGroup.clone()
-                            // console.log(`${chapter}:${section}:${subsection}:${subsubsection}`)
+                        // console.log(`${chapter}:${section}:${subsection}:${subsubsection}`)
                         animsArray[subsubsection].normalize(Actor.actionSet()[chapter][section][subsection][subsubsection].start / this.fps, Actor.actionSet()[chapter][section][subsection][subsubsection].end / this.fps)
                     })
                     switch (chapter) {
@@ -101,15 +102,18 @@ export class Actor {
                                     case "stand":
                                         {
                                             this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
-                                                if (this.isHit) {
-                                                    this._state.subsubsection = 1
-                                                } else {
-                                                    this._state.subsubsection = 2
+                                                if (this._state.chapter == "attack") {
+                                                    if (this.isHit) {
+                                                        this._state.subsubsection = 1
+                                                    } else {
+                                                        this._state.subsubsection = 2
+                                                    }
                                                 }
                                             })
                                             this._actions[chapter][section][subsection][1].onAnimationEndObservable.add(() => {
-
-                                                this._state.subsubsection = 2
+                                                if (this._state.chapter == "attack") {
+                                                    this._state.subsubsection = 2
+                                                }
 
                                             })
                                             this._actions[chapter][section][subsection][2].onAnimationEndObservable.add(() => {
@@ -149,6 +153,45 @@ export class Actor {
 
                                                 }
                                             })
+
+                                            break;
+                                        }
+                                    case "jump":
+                                        {
+                                            switch (subsection) {
+                                                case "small": {
+                                                    this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
+                                                        if (this.isHit) {
+                                                            this._state.subsubsection = 1
+                                                        } else {
+                                                            this._state.subsubsection = 2
+                                                        }
+                                                    })
+
+                                                    this._actions[chapter][section][subsection][1].onAnimationEndObservable.add(() => {
+                                                        this._state.subsubsection = 2
+                                                    })
+                                                    this._actions[chapter][section][subsection][2].onAnimationEndObservable.add(() => {
+                                                        this._state.chapter = "normal"
+                                                        this._state.subsection = "main"
+                                                        this._state.subsubsection = 0
+                                                    })
+                                                    break;
+                                                }
+                                                default: {
+                                                    this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
+                                                        this._state.subsubsection = 1
+                                                    })
+
+                                                    this._actions[chapter][section][subsection][1].onAnimationEndObservable.add(() => {
+                                                        this._state.chapter = "normal"
+                                                        this._state.subsection = "main"
+                                                        this._state.subsubsection = 0
+                                                    })
+                                                    break;
+                                                }
+                                            }
+
 
                                             break;
                                         }
@@ -224,10 +267,15 @@ export class Actor {
                     {
                         if (!this.keyDown.attack.small) {
                             if (this._state.chapter == "normal") {
-                                this._state.chapter = "attack"
-                                this._state.subsection = "small"
-                                this._state.subsubsection = 0
-                                this.keyDown.attack.small = true
+                                if (this.jumpAttackNum < 5) {
+                                    this._state.chapter = "attack"
+                                    this._state.subsection = "small"
+                                    this._state.subsubsection = 0
+                                    this.keyDown.attack.small = true
+                                    if (this._state.section == "jump") {
+                                        this.jumpAttackNum += 1
+                                    }
+                                }
                             }
                         }
                         break;
@@ -236,10 +284,15 @@ export class Actor {
                     {
                         if (!this.keyDown.attack.medium) {
                             if (this._state.chapter == "normal") {
-                                this._state.chapter = "attack"
-                                this._state.subsection = "medium"
-                                this._state.subsubsection = 0
-                                this.keyDown.attack.medium = true
+                                if (this.jumpAttackNum < 5) {
+                                    this._state.chapter = "attack"
+                                    this._state.subsection = "medium"
+                                    this._state.subsubsection = 0
+                                    this.keyDown.attack.medium = true
+                                    if (this._state.section == "jump") {
+                                        this.jumpAttackNum += 2
+                                    }
+                                }
                             }
                         }
                         break;
@@ -248,10 +301,15 @@ export class Actor {
                     {
                         if (!this.keyDown.attack.large) {
                             if (this._state.chapter == "normal") {
-                                this._state.chapter = "attack"
-                                this._state.subsection = "large"
-                                this._state.subsubsection = 0
-                                this.keyDown.attack.large = true
+                                if (this.jumpAttackNum < 5) {
+                                    this._state.chapter = "attack"
+                                    this._state.subsection = "large"
+                                    this._state.subsubsection = 0
+                                    this.keyDown.attack.large = true
+                                    if (this._state.section == "jump") {
+                                        this.jumpAttackNum += 3
+                                    }
+                                }
                             }
                         }
                         break;
@@ -265,11 +323,13 @@ export class Actor {
                 case keySet.right:
                     {
                         if (this.keyDown.right) {
-                            this._state.subsection = "main"
+                            if (this._state.chapter == "normal") {
+                                this._state.subsection = "main"
+                            }
                         }
                         if (this.keyDown.left) {
-                            if (this._state.chapter != "normal") {
-                                if (this._state.section != "jump") {
+                            if (this._state.chapter == "normal") {
+                                if (this._state.section == "stand") {
                                     this._state.subsection = this.faceTo == "left" ? "forward" : "backward"
                                 }
                             }
@@ -280,11 +340,13 @@ export class Actor {
                 case keySet.left:
                     {
                         if (this.keyDown.left) {
-                            this._state.subsection = "main"
+                            if (this._state.chapter == "normal") {
+                                this._state.subsection = "main"
+                            }
                         }
                         if (this.keyDown.right) {
-                            if (this._state.chapter != "normal") {
-                                if (this._state.section != "jump") {
+                            if (this._state.chapter == "normal") {
+                                if (this._state.section == "stand") {
                                     this._state.subsection = this.faceTo == "right" ? "forward" : "backward"
                                 }
                             }
@@ -377,22 +439,22 @@ export class Actor {
                 },
                 squat: {
                     main: [{
-                            start: 801,
-                            end: 820,
-                            atk: 0,
-                            speed: 3
-                        },
-                        {
-                            start: 821,
-                            end: 880,
-                            atk: 0
-                        },
-                        {
-                            start: 1101,
-                            end: 1120,
-                            atk: 0,
-                            speed: 3
-                        }
+                        start: 801,
+                        end: 820,
+                        atk: 0,
+                        speed: 3
+                    },
+                    {
+                        start: 821,
+                        end: 880,
+                        atk: 0
+                    },
+                    {
+                        start: 1101,
+                        end: 1120,
+                        atk: 0,
+                        speed: 3
+                    }
                     ],
                     // forward: [{
                     //     start: 881,
@@ -411,7 +473,8 @@ export class Actor {
                     small: [{
                         start: 101,
                         end: 109,
-                        atk: 100
+                        atk: 100,
+                        speed: 1.5
                     }, {
                         start: 109,
                         end: 119,
@@ -419,7 +482,8 @@ export class Actor {
                     }, {
                         start: 119,
                         end: 130,
-                        atk: 0
+                        atk: 0,
+                        speed: 1.5
                     }],
                     medium: [{
                         start: 131,
@@ -452,7 +516,8 @@ export class Actor {
                     small: [{
                         start: 441,
                         end: 450,
-                        atk: 150
+                        atk: 150,
+                        speed: 1.5
                     }, {
                         start: 450,
                         end: 460,
@@ -460,25 +525,28 @@ export class Actor {
                     }, {
                         start: 460,
                         end: 470,
-                        atk: 0
+                        atk: 0,
+                        speed: 1.5
                     }],
                     medium: [{
                         start: 471,
                         end: 493,
-                        atk: 240
+                        atk: 240,
                     }, {
                         start: 493,
                         end: 510,
-                        atk: 0
+                        atk: 0,
                     }],
                     large: [{
                         start: 511,
                         end: 555,
-                        atk: 500
+                        atk: 500,
+                        speed: 1.8
                     }, {
                         start: 555,
                         end: 570,
-                        atk: 0
+                        atk: 0,
+                        speed: 1.2
                     }],
                     fall: [{
                         start: 571,
@@ -668,15 +736,17 @@ export class Actor {
                     this._actions[chapter][section][subsection].forEach((anim, subsubsection) => {
                         if (`${chapter}:${section}:${subsection}:${subsubsection}` != `${this._state["chapter"]}:${this._state["section"]}:${this._state["subsection"]}:${this._state["subsubsection"]}`) {
                             anim.stop()
-                        } else {}
+                        } else { }
                     })
                 }))
             }))
         }))
     }
 
-    tick() {
-        // console.log(`${this._state.chapter}:${this._state.section}:${this._state.subsection}:${this._state.subsubsection}`)
+    tick(debug) {
+        if (debug) {
+            console.log(`${this._state.chapter}:${this._state.section}:${this._state.subsection}:${this._state.subsubsection}`)
+        }
         this.stopAnimation()
         this._actions[this._state.chapter][this._state.section][this._state.subsection][this._state.subsubsection].start(false, Actor.actionSet()[this._state.chapter][this._state.section][this._state.subsection][this._state.subsubsection].speed)
         if (`${this._state["chapter"]}:${this._state["section"]}:${this._state["subsection"]}` == "normal:stand:main") {
@@ -688,10 +758,12 @@ export class Actor {
                     switch (this._state.section) {
                         case "stand":
                             {
+                                this.jumpAttackNum = 0
                                 break;
                             }
                         case "squat":
                             {
+                                this.jumpAttackNum = 0
                                 break;
                             }
                         case "jump":
@@ -784,7 +856,11 @@ export class Actor {
             }
         }
         if (this.mesh.position.y > 0) {
-            this.vector.y -= 0.02
+            if (this.isHit) {
+                this.vector.y = 0
+            } else {
+                this.vector.y -= 0.02
+            }
         } else {
             this.mesh.position.y = 0
             this.vector.y = 0
