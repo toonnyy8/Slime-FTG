@@ -118,7 +118,28 @@ export class Actor {
 
                                             break;
                                         }
+                                    case "squat":
+                                        {
+                                            this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
+                                                if (this.isHit) {
+                                                    this._state.subsubsection = 1
+                                                } else {
+                                                    this._state.subsubsection = 2
+                                                }
+                                            })
+                                            this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
 
+                                                this._state.subsubsection = 2
+
+                                            })
+                                            this._actions[chapter][section][subsection][2].onAnimationEndObservable.add(() => {
+                                                this._state.subsubsection = 0
+                                                this._state.chapter = "normal"
+                                                this._state.subsection = "main"
+                                            })
+
+                                            break;
+                                        }
                                     default:
                                         break;
                                 }
