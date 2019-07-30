@@ -3,14 +3,17 @@ import fs from 'fs'
 import * as BABYLON from "babylonjs"
 
 export class Actor {
-    constructor({ mesh, animationGroup, keySet = { jump: "w", squat: "s", left: "a", right: "d", attack: { small: "j", medium: "k", large: "l" } }, fps = 60 }) {
+    constructor({ mesh, animationGroup, skeleton, scene, keySet = { jump: "w", squat: "s", left: "a", right: "d", attack: { small: "j", medium: "k", large: "l" } }, fps = 60 }) {
         this._fps = fps && !Number.isNaN(fps - 0) ? fps : this.fps
         this._actions = Actor.actionSet()
         this.keyBuffer = []
         this._mainState = "normal"
         this._detailState = "stand"
         this._state = { chapter: "normal", section: "stand", subsection: "main", subsubsection: 0 }
+        this._animationGroup = animationGroup
         this._mesh = mesh
+        this._skeleton = skeleton
+        this._scene = scene
         this._opponent = null
         this.keyDown = {
             jump: false,
@@ -28,7 +31,16 @@ export class Actor {
         this.jumpTimes = 0
 
         this.vector = BABYLON.Vector3.Zero()
+        //collision boxes
+        this._collisionBoxes = []
+        this.skeleton.bones.forEach(() => {
+            let box = new BABYLON.MeshBuilder.CreateBox("box", { height: 1, width: 1, depth: 1, updatable: true }, this.scene)
+            box.PhysicsImpostor = new BABYLON.PhysicsImpostor(box, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0 }, this.scene)
+            this._collisionBoxes.push(box)
+        })
 
+
+        //animatiom
         Object.keys(this._actions).forEach(chapter => {
             Object.keys(this._actions[chapter]).forEach(section => {
                 Object.keys(this._actions[chapter][section]).forEach(subsection => {
@@ -725,8 +737,20 @@ export class Actor {
     get fps() {
         return this._fps || 60
     }
+    get animationGroup() {
+        return this._animationGroup
+    }
     get mesh() {
         return this._mesh
+    }
+    get skeleton() {
+        return this._skeleton
+    }
+    get scene() {
+        return this._scene
+    }
+    get collisionBoxes() {
+        return this._collisionBoxes
     }
 
     stopAnimation() {
@@ -749,6 +773,7 @@ export class Actor {
         }
         this.stopAnimation()
         this._actions[this._state.chapter][this._state.section][this._state.subsection][this._state.subsubsection].start(false, Actor.actionSet()[this._state.chapter][this._state.section][this._state.subsection][this._state.subsubsection].speed)
+
         if (`${this._state["chapter"]}:${this._state["section"]}:${this._state["subsection"]}` == "normal:stand:main") {
             this.vector = BABYLON.Vector3.Zero()
         }
@@ -878,6 +903,22 @@ export class Actor {
                 this.mesh.rotationQuaternion = new BABYLON.Vector3(0, Math.PI, 0).toQuaternion()
             }
         }
+
+
+        this.skeleton.bones.forEach((bone, index) => {
+            this.collisionBoxes[index].PhysicsImpostor.syncImpostorWithBone(bone, this.mesh)
+        })
+        this.collisionBoxes.forEach((thisBox) => {
+            this.opponent.collisionBoxes.forEach((oppoBox) => {
+                if (thisBox.intersectsMesh(oppoBox, true)) {
+                    if (this._state.chapter == "attack") {
+
+                        console.log("c")
+                    }
+                }
+            })
+        })
+
     }
     setOpponent(opponent) {
         this._opponent = opponent

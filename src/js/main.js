@@ -3,6 +3,9 @@ import "@babel/polyfill"
 import * as BABYLON from './babylon-module'
 
 import * as slime from "../../file/slime/slime.js"
+import * as CANNON from "cannon"
+
+global.CANNON = CANNON
 
 // Get the canvas DOM element
 let canvas = document.getElementById('bobylonCanvas')
@@ -14,6 +17,8 @@ function createScene() {
 
     // This creates a basic Babylon Scene object (non-mesh)
     let scene = new BABYLON.Scene(engine)
+    scene.enablePhysics()
+
     //Adding an Arc Rotate Camera
     // let camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 15, new BABYLON.Vector3(0, 5, 0), scene)
     var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 10, 100), scene);
@@ -43,21 +48,13 @@ function createScene() {
         console.log(animationGroups)
         // meshes[0].position.x = 5
         // meshes[0].position.z = -2
-
         let animationGroup = animationGroups[0] //.start(false)
         animationGroup.stop()
-        player1 = new slime.Actor({ mesh: meshes[0], animationGroup: animationGroups[0] })
+        player1 = new slime.Actor({ mesh: meshes[0], animationGroup: animationGroups[0], skeleton: skeletons[0], scene: scene })
         // Create a skeleton viewer for the mesh
         var skeletonViewer = new BABYLON.Debug.SkeletonViewer(skeletons[0], meshes[0], scene);
         skeletonViewer.isEnabled = true; // Enable it
         skeletonViewer.color = BABYLON.Color3.Red(); // Change default color from white to red
-
-        let a = BABYLON.Mesh.CreateSphere("Sphere1", 2, 1)
-        a.scaling.x = 0.2
-        a.scaling.y = 0.2
-        a.scaling.z = 0.2
-
-        a.attachToBone(skeletons[0].bones[10])
 
         BABYLON.SceneLoader.ImportMesh("", slime.Actor.url(), "", scene, (meshes, particleSystems, skeletons, animationGroups) => {
             console.log(skeletons)
@@ -75,6 +72,7 @@ function createScene() {
             player2 = new slime.Actor({
                 mesh: meshes[0],
                 animationGroup: animationGroups[0],
+                skeleton: skeletons[0],
                 keySet: { jump: "ArrowUp", squat: "ArrowDown", left: "ArrowLeft", right: "ArrowRight", attack: { small: "1", medium: "2", large: "3" } }
             })
 
