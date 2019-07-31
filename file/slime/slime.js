@@ -119,27 +119,58 @@ export class Actor {
                                 switch (section) {
                                     case "stand":
                                         {
-                                            this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
-                                                if (this._state.chapter == "attack") {
-                                                    if (this.isHit) {
-                                                        this._state.subsubsection = 1
-                                                    } else {
-                                                        this._state.subsubsection = 2
+                                            if (subsection != "large") {
+                                                this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
+                                                    if (this._state.chapter == "attack") {
+                                                        if (this.isHit) {
+                                                            this._state.subsubsection = 1
+                                                        } else {
+                                                            this._state.subsubsection = 2
+                                                        }
                                                     }
-                                                }
-                                            })
-                                            this._actions[chapter][section][subsection][1].onAnimationEndObservable.add(() => {
-                                                if (this._state.chapter == "attack") {
-                                                    this._state.subsubsection = 2
-                                                }
+                                                })
+                                                this._actions[chapter][section][subsection][1].onAnimationEndObservable.add(() => {
+                                                    if (this._state.chapter == "attack") {
+                                                        this._state.subsubsection = 2
+                                                        this.isHit = false
+                                                    }
 
-                                            })
-                                            this._actions[chapter][section][subsection][2].onAnimationEndObservable.add(() => {
-                                                this._state.subsubsection = 0
-                                                this._state.chapter = "normal"
-                                                this._state.subsection = "main"
-                                            })
+                                                })
+                                                this._actions[chapter][section][subsection][2].onAnimationEndObservable.add(() => {
+                                                    this._state.subsubsection = 0
+                                                    this._state.chapter = "normal"
+                                                    this._state.subsection = "main"
+                                                    this.isHit = false
+                                                })
+                                            } else {
+                                                this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
+                                                    if (this._state.chapter == "attack") {
+                                                        this._state.subsubsection = 1
+                                                    }
+                                                })
+                                                this._actions[chapter][section][subsection][1].onAnimationEndObservable.add(() => {
+                                                    if (this._state.chapter == "attack") {
+                                                        if (this.isHit) {
+                                                            this._state.subsubsection = 2
+                                                        } else {
+                                                            this._state.subsubsection = 3
+                                                        }
+                                                    }
+                                                })
+                                                this._actions[chapter][section][subsection][2].onAnimationEndObservable.add(() => {
+                                                    if (this._state.chapter == "attack") {
+                                                        this._state.subsubsection = 3
+                                                        this.isHit = false
+                                                    }
 
+                                                })
+                                                this._actions[chapter][section][subsection][3].onAnimationEndObservable.add(() => {
+                                                    this._state.subsubsection = 0
+                                                    this._state.chapter = "normal"
+                                                    this._state.subsection = "main"
+                                                    this.isHit = false
+                                                })
+                                            }
                                             break;
                                         }
                                     case "squat":
@@ -148,6 +179,17 @@ export class Actor {
                                                 this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
                                                     this._state.subsubsection = 1
                                                     this.vector.x = this.faceTo == "left" ? 1 : -1
+                                                })
+                                            } else if (subsection == "large") {
+                                                this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
+                                                    this._state.subsubsection = 1
+                                                })
+                                                this._actions[chapter][section][subsection][1].onAnimationEndObservable.add(() => {
+                                                    if (this.isHit) {
+                                                        this._state.subsubsection = 2
+                                                    } else {
+                                                        this._state.subsubsection = 3
+                                                    }
                                                 })
                                             } else {
                                                 this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
@@ -158,19 +200,40 @@ export class Actor {
                                                     }
                                                 })
                                             }
-                                            this._actions[chapter][section][subsection][1].onAnimationEndObservable.add(() => {
-                                                this._state.subsubsection = 2
-                                            })
-                                            this._actions[chapter][section][subsection][2].onAnimationEndObservable.add(() => {
-                                                this._state.chapter = "normal"
-                                                this._state.subsection = "main"
-                                                if (this.keyDown.squat) {
-                                                    this._state.subsubsection = 1
-                                                } else {
+                                            if (subsection == "large") {
+                                                this._actions[chapter][section][subsection][2].onAnimationEndObservable.add(() => {
+                                                    this._state.subsubsection = 3
+                                                    this.isHit = false
+                                                })
+                                                this._actions[chapter][section][subsection][3].onAnimationEndObservable.add(() => {
+                                                    this._state.chapter = "normal"
+                                                    this._state.subsection = "main"
+                                                    if (this.keyDown.squat) {
+                                                        this._state.subsubsection = 1
+                                                    } else {
+                                                        this._state.subsubsection = 2
+                                                    }
+                                                    this.isHit = false
+                                                })
+                                            } else {
+                                                this._actions[chapter][section][subsection][1].onAnimationEndObservable.add(() => {
                                                     this._state.subsubsection = 2
+                                                    this.isHit = false
+                                                })
+                                                this._actions[chapter][section][subsection][2].onAnimationEndObservable.add(() => {
+                                                    this._state.chapter = "normal"
+                                                    this._state.subsection = "main"
+                                                    if (this.keyDown.squat) {
+                                                        this._state.subsubsection = 1
+                                                    } else {
+                                                        this._state.subsubsection = 2
 
-                                                }
-                                            })
+                                                    }
+                                                    this.isHit = false
+                                                })
+                                            }
+
+
 
                                             break;
                                         }
@@ -189,11 +252,13 @@ export class Actor {
 
                                                         this._actions[chapter][section][subsection][1].onAnimationEndObservable.add(() => {
                                                             this._state.subsubsection = 2
+                                                            this.isHit = false
                                                         })
                                                         this._actions[chapter][section][subsection][2].onAnimationEndObservable.add(() => {
                                                             this._state.chapter = "normal"
                                                             this._state.subsection = "main"
                                                             this._state.subsubsection = 0
+                                                            this.isHit = false
                                                         })
                                                         break;
                                                     }
@@ -207,6 +272,7 @@ export class Actor {
                                                             this._state.chapter = "normal"
                                                             this._state.subsection = "main"
                                                             this._state.subsubsection = 0
+                                                            this.isHit = false
                                                         })
                                                         break;
                                                     }
@@ -218,6 +284,115 @@ export class Actor {
                                     default:
                                         break;
                                 }
+                                break;
+                            }
+                        case "hitRecover":
+                            {
+                                switch (section) {
+                                    case "stand":
+                                        {
+                                            this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
+                                                if (this._state.chapter == "hitRecover") {
+                                                    this._state.subsubsection = 1
+                                                }
+                                            })
+
+                                            if (subsection != "large") {
+                                                this._actions[chapter][section][subsection][1].onAnimationEndObservable.add(() => {
+                                                    if (this._state.chapter == "hitRecover") {
+                                                        this._state.subsubsection = 0
+                                                        this._state.chapter = "normal"
+                                                        this._state.subsection = "main"
+                                                    }
+                                                })
+                                            } else {
+                                                this._actions[chapter][section][subsection][1].onAnimationEndObservable.add(() => {
+                                                    if (this._state.chapter == "hitRecover") {
+                                                        this._state.section = "reStand"
+                                                        this._state.subsection = "main"
+                                                        this._state.subsubsection = 0
+                                                    }
+                                                })
+                                            }
+
+                                            break;
+                                        }
+                                    case "squat":
+                                        {
+                                            this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
+                                                if (this._state.chapter == "hitRecover") {
+                                                    this._state.subsubsection = 1
+                                                }
+                                            })
+
+                                            if (subsection != "large") {
+                                                this._actions[chapter][section][subsection][1].onAnimationEndObservable.add(() => {
+                                                    if (this._state.chapter == "hitRecover") {
+                                                        this._state.subsubsection = 1
+                                                        this._state.chapter = "normal"
+                                                        this._state.subsection = "main"
+                                                    }
+                                                })
+                                            } else {
+                                                this._actions[chapter][section][subsection][1].onAnimationEndObservable.add(() => {
+                                                    if (this._state.chapter == "hitRecover") {
+                                                        this._state.section = "reStand"
+                                                        this._state.subsection = "main"
+                                                        this._state.subsubsection = 0
+                                                    }
+                                                })
+                                            }
+
+                                            break;
+                                        }
+                                    case "jump":
+                                        {
+                                            this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
+                                                if (this._state.chapter == "hitRecover") {
+                                                    if (this._state.section == "jump") {
+                                                        this._state.subsubsection = 1
+                                                    }
+                                                }
+                                            })
+
+
+                                            this._actions[chapter][section][subsection][1].onAnimationEndObservable.add(() => {
+                                                if (this._state.chapter == "hitRecover") {
+                                                    if (this._state.section == "jump") {
+                                                        this._state.section = "reStand"
+                                                        this._state.subsection = "main"
+                                                        this._state.subsubsection = 0
+                                                    }
+                                                }
+                                            })
+
+                                            break;
+                                        }
+                                    case "reStand":
+                                        {
+                                            this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
+                                                if (this._state.chapter == "hitRecover") {
+                                                    this._state.subsubsection = 1
+                                                }
+                                            })
+                                            this._actions[chapter][section][subsection][1].onAnimationEndObservable.add(() => {
+                                                if (this._state.chapter == "hitRecover") {
+                                                    this._state.chapter = "normal"
+                                                    this._state.subsection = "main"
+                                                    if (this.keyDown.squat) {
+                                                        this._state.section = "squat"
+                                                    } else {
+                                                        this._state.section = "stand"
+                                                    }
+                                                    this._state.subsubsection = 0
+                                                }
+                                            })
+                                            break;
+                                        }
+                                    default:
+                                        break;
+                                }
+                                break;
                                 break;
                             }
                         default:
@@ -499,7 +674,8 @@ export class Actor {
                     }, {
                         start: 109,
                         end: 119,
-                        atk: 0
+                        atk: 0,
+                        speed: 2
                     }, {
                         start: 119,
                         end: 130,
@@ -514,7 +690,8 @@ export class Actor {
                     }, {
                         start: 150,
                         end: 160,
-                        atk: 0
+                        atk: 0,
+                        speed: 2
                     }, {
                         start: 160,
                         end: 170,
@@ -522,13 +699,18 @@ export class Actor {
                     }],
                     large: [{
                         start: 171,
+                        end: 185,
+                        atk: 0
+                    }, {
+                        start: 185,
                         end: 197,
                         atk: 300,
                         boxes: [12]
                     }, {
                         start: 197,
                         end: 207,
-                        atk: 0
+                        atk: 0,
+                        speed: 2
                     }, {
                         start: 207,
                         end: 220,
@@ -540,11 +722,13 @@ export class Actor {
                         start: 441,
                         end: 450,
                         atk: 150,
-                        speed: 1.5
+                        speed: 1.5,
+                        boxes: [12]
                     }, {
                         start: 450,
                         end: 460,
-                        atk: 0
+                        atk: 0,
+                        speed: 2
                     }, {
                         start: 460,
                         end: 470,
@@ -555,6 +739,7 @@ export class Actor {
                         start: 471,
                         end: 493,
                         atk: 240,
+                        boxes: [12]
                     }, {
                         start: 493,
                         end: 510,
@@ -564,7 +749,8 @@ export class Actor {
                         start: 511,
                         end: 555,
                         atk: 500,
-                        speed: 1.8
+                        speed: 1.8,
+                        boxes: [7, 6]
                     }, {
                         start: 555,
                         end: 570,
@@ -574,11 +760,13 @@ export class Actor {
                     fall: [{
                         start: 571,
                         end: 580,
-                        atk: 50
+                        atk: 50,
+                        boxes: [1]
                     }, {
                         start: 581,
                         end: 600,
-                        atk: 50
+                        atk: 50,
+                        boxes: [1]
                     }, {
                         start: 601,
                         end: 630,
@@ -593,7 +781,8 @@ export class Actor {
                     }, {
                         start: 970,
                         end: 985,
-                        atk: 100
+                        atk: 100,
+                        boxes: [12]
                     }, {
                         start: 985,
                         end: 1000,
@@ -602,29 +791,40 @@ export class Actor {
                     medium: [{
                         start: 1001,
                         end: 1018,
-                        atk: 250
+                        atk: 250,
+                        boxes: [12]
                     }, {
                         start: 1018,
                         end: 1030,
-                        atk: 0
+                        atk: 0,
+                        speed: 2
                     }, {
                         start: 1030,
                         end: 1040,
                         atk: 0
                     }],
                     large: [{
-                        start: 1041,
-                        end: 1058,
-                        atk: 500
-                    }, {
-                        start: 1058,
-                        end: 1071,
-                        atk: 0
-                    }, {
-                        start: 1071,
-                        end: 1100,
-                        atk: 0
-                    }]
+                            start: 1041,
+                            end: 1051,
+                            atk: 0
+                        },
+                        {
+                            start: 1051,
+                            end: 1058,
+                            atk: 500,
+                            boxes: [12]
+                        },
+                        {
+                            start: 1058,
+                            end: 1071,
+                            atk: 0,
+                            speed: 2
+                        }, {
+                            start: 1071,
+                            end: 1100,
+                            atk: 0
+                        }
+                    ]
                 }
             },
             defense: {
@@ -734,10 +934,17 @@ export class Actor {
                 },
                 reStand: {
                     main: [{
-                        start: 1301,
-                        end: 1330,
-                        atk: 0
-                    }]
+                            start: 1300,
+                            end: 1301,
+                            atk: 0,
+                            speed: 0.1
+                        },
+                        {
+                            start: 1301,
+                            end: 1330,
+                            atk: 0
+                        }
+                    ]
                 }
             }
         }
@@ -782,15 +989,19 @@ export class Actor {
     }
 
     tick(debug) {
+
         if (debug) {
             console.log(`${this._state.chapter}:${this._state.section}:${this._state.subsection}:${this._state.subsubsection}`)
         }
         this.stopAnimation()
         this._actions[this._state.chapter][this._state.section][this._state.subsection][this._state.subsubsection].start(false, Actor.actionSet()[this._state.chapter][this._state.section][this._state.subsection][this._state.subsubsection].speed)
+        this._actions[this._state.chapter][this._state.section][this._state.subsection][this._state.subsubsection].play()
 
         if (`${this._state["chapter"]}:${this._state["section"]}:${this._state["subsection"]}` == "normal:stand:main") {
             this.vector = BABYLON.Vector3.Zero()
         }
+
+
         switch (this._state.chapter) {
             case "normal":
                 {
@@ -798,18 +1009,19 @@ export class Actor {
                         case "stand":
                             {
                                 this.jumpAttackNum = 0
+                                this.jumpTimes = 0
                                 break;
                             }
                         case "squat":
                             {
                                 this.jumpAttackNum = 0
+                                this.jumpTimes = 0
                                 break;
                             }
                         case "jump":
                             {
                                 if (this.mesh.position.y <= 0) {
                                     this.mesh.position.y = 0
-                                    this.jumpTimes = 0
                                     if (this.keyDown.squat) {
                                         this._state.section = "squat"
                                         this._state.subsection = "main"
@@ -862,6 +1074,17 @@ export class Actor {
                     }
                     break;
                 }
+            case "hitRecover":
+                {
+                    if (this._state.section == "jump") {
+                        if (this.mesh.position.y <= 0) {
+                            this._state.section = "reStand"
+                            this._state.subsection = "main"
+                            this._state.subsubsection = 0
+                        }
+                    }
+                    break;
+                }
             default:
                 break;
         }
@@ -904,6 +1127,15 @@ export class Actor {
             this.mesh.position.y = 0
             this.vector.y = 0
         }
+        //Actor Intersect Collisions
+        if (this.bodyBox.intersectsMesh(this.opponent.bodyBox, true)) {
+            if (this.faceTo == "left") {
+                this.mesh.position.x -= 0.05
+            } else {
+                this.mesh.position.x += 0.05
+            }
+            this.vector.x = 0
+        }
         this.mesh.position = this.mesh.position.add(this.vector)
 
         if (this.mesh.position.x > 11) { this.mesh.position.x = 11 }
@@ -935,15 +1167,17 @@ export class Actor {
             this.collisionBoxes[index].PhysicsImpostor.syncImpostorWithBone(bone, this.mesh)
         })
         let attackBox = Actor.actionSet()[this._state.chapter][this._state.section][this._state.subsection][this._state.subsubsection].boxes
-        if (attackBox) {
+        if (attackBox && !this.isHit) {
             attackBox.forEach((boxIndex) => {
                 if (this.collisionBoxes[boxIndex].intersectsMesh(this.opponent.bodyBox, true)) {
                     if (this._state.chapter == "attack") {
-                        console.log("c")
+                        this.opponent.beInjured(100, this._state.subsection)
+                        this.isHit = true
                     }
                 }
             })
         }
+
         // this.collisionBoxes.forEach((thisBox) => {
         //     this.opponent.collisionBoxes.forEach((oppoBox) => {
         //         if (thisBox.intersectsMesh(oppoBox, true)) {
@@ -956,6 +1190,7 @@ export class Actor {
         // })
 
     }
+
     setOpponent(opponent) {
         this._opponent = opponent
     }
@@ -964,5 +1199,11 @@ export class Actor {
     }
     get faceTo() {
         return this.opponent.mesh.position.x > this.mesh.position.x ? "left" : "right"
+    }
+
+    beInjured(atk = 100, scale = "small") {
+        this._state.chapter = "hitRecover"
+        this._state.subsection = this._state.section == "jump" ? "large" : scale
+        this._state.subsubsection = 0
     }
 }

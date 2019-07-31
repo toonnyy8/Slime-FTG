@@ -9,9 +9,9 @@ global.CANNON = CANNON
 
 // Get the canvas DOM element
 let canvas = document.getElementById('bobylonCanvas')
-// Load the 3D engine
+    // Load the 3D engine
 let engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true })
-// CreateScene function that creates and return the scene
+    // CreateScene function that creates and return the scene
 
 function createScene() {
 
@@ -32,7 +32,7 @@ function createScene() {
     camera.setTarget(new BABYLON.Vector3(0, 4, 0));
     // attach the camera to the canvas
     camera.attachControl(canvas, false)
-    //Adding a light
+        //Adding a light
     let light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 5, 0), scene);
     light.diffuse = new BABYLON.Color3(0.9, 0.85, 0.8);
     light.specular = new BABYLON.Color3(1, 1, 1);
@@ -46,12 +46,12 @@ function createScene() {
         console.log(skeletons)
         console.log(meshes)
         console.log(animationGroups)
-        // meshes[0].position.x = 5
-        // meshes[0].position.z = -2
+            // meshes[0].position.x = 5
+            // meshes[0].position.z = -2
         let animationGroup = animationGroups[0] //.start(false)
         animationGroup.stop()
         player1 = new slime.Actor({ mesh: meshes[0], animationGroup: animationGroups[0], skeleton: skeletons[0], scene: scene })
-        // Create a skeleton viewer for the mesh
+            // Create a skeleton viewer for the mesh
         var skeletonViewer = new BABYLON.Debug.SkeletonViewer(skeletons[0], meshes[0], scene);
         skeletonViewer.isEnabled = true; // Enable it
         skeletonViewer.color = BABYLON.Color3.Red(); // Change default color from white to red
@@ -60,8 +60,8 @@ function createScene() {
             console.log(skeletons)
             console.log(meshes)
             console.log(animationGroups)
-            // meshes[0].position.x = 5
-            // meshes[0].position.z = -2
+                // meshes[0].position.x = 5
+                // meshes[0].position.z = -2
             meshes[1].material.diffuseColor = new BABYLON.Color3(0.1, 0, 0);
             meshes[1].material.specularColor = new BABYLON.Color3(0.5, 0, 0);
             meshes[1].material.emissiveColor = new BABYLON.Color3(0.5, 0, 0);
@@ -86,15 +86,20 @@ function createScene() {
             player2.setOpponent(player1)
 
             engine.runRenderLoop(() => {
-                player1.tick(false)
+                player1.tick(true)
             })
             engine.runRenderLoop(() => {
                 player2.tick(false)
             })
             engine.runRenderLoop(() => {
-                scene.render()
-            })
-            /*
+                    scene.render()
+                    if (player1.isHit || player2.isHit) {
+                        camera.setTarget(new BABYLON.Vector3(-0.05 + Math.random() * 0.1, 3.95 + Math.random() * 0.1, 0));
+                    } else {
+                        camera.setTarget(new BABYLON.Vector3(0, 4, 0));
+                    }
+                })
+                /*
         slime.action.attackFall._ = animationGroup.clone()
         slime.action.attackFall._.normalize(slime.action.attackFall.start / slime.fps, slime.action.attackFall.end / slime.fps)
  
@@ -111,24 +116,24 @@ function createScene() {
         slime.action.attackFall._.onAnimationEndObservable.addOnce(loop("attackFall"))
         slime.action.attackFall._.start()
         */
-            // let forward = animationGroup.clone()
-            // forward.normalize(slime.Actor.actionSet().normal.standForward[0].start / slime.fps, slime.Actor.actionSet().normal.standForward[0].end / slime.fps)
-            // let backward = animationGroup.clone()
-            // backward.normalize(slime.Actor.actionSet().normal.standBackward[0].start / slime.fps, slime.Actor.actionSet().normal.standBackward[0].end / slime.fps)
-            // let faceTo = -1.5
-            // forward.start(true)
-            // engine.runRenderLoop(() => {
-            //     if (meshes[0].position.x == -11) {
-            //         faceTo = -1.5
-            //         backward.stop()
-            //         forward.start(true)
-            //     } else if (meshes[0].position.x == 11) {
-            //         faceTo = 1
-            //         forward.stop()
-            //         backward.start(true)
-            //     }
-            //     meshes[0].position.x -= 0.05 * faceTo
-            // })
+                // let forward = animationGroup.clone()
+                // forward.normalize(slime.Actor.actionSet().normal.standForward[0].start / slime.fps, slime.Actor.actionSet().normal.standForward[0].end / slime.fps)
+                // let backward = animationGroup.clone()
+                // backward.normalize(slime.Actor.actionSet().normal.standBackward[0].start / slime.fps, slime.Actor.actionSet().normal.standBackward[0].end / slime.fps)
+                // let faceTo = -1.5
+                // forward.start(true)
+                // engine.runRenderLoop(() => {
+                //     if (meshes[0].position.x == -11) {
+                //         faceTo = -1.5
+                //         backward.stop()
+                //         forward.start(true)
+                //     } else if (meshes[0].position.x == 11) {
+                //         faceTo = 1
+                //         forward.stop()
+                //         backward.start(true)
+                //     }
+                //     meshes[0].position.x -= 0.05 * faceTo
+                // })
         }, null, null, ".glb")
     }, null, null, ".glb")
 
@@ -141,11 +146,11 @@ function createScene() {
 }
 // call the createScene function
 let scene = createScene()
-// run the render loop
-// engine.runRenderLoop(() => {
-//     scene.render()
-// })
-// the canvas/window resize event handler
+    // run the render loop
+    // engine.runRenderLoop(() => {
+    //     scene.render()
+    // })
+    // the canvas/window resize event handler
 window.addEventListener('resize', () => {
     engine.resize()
 })
