@@ -31,14 +31,20 @@ export class Actor {
         this.jumpTimes = 0
 
         this.vector = BABYLON.Vector3.Zero()
-        //collision boxes
+            //collision boxes
         this._collisionBoxes = []
-        this.skeleton.bones.forEach(() => {
-            let box = new BABYLON.MeshBuilder.CreateBox("box", { height: 1, width: 1, depth: 1, updatable: true }, this.scene)
-            box.PhysicsImpostor = new BABYLON.PhysicsImpostor(box, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0 }, this.scene)
+        this.skeleton.bones.forEach((bone, index) => {
+            let box = new BABYLON.MeshBuilder.CreateBox("box", { size: 0.2, updatable: true }, this.scene)
+            box.PhysicsImpostor = new BABYLON.PhysicsImpostor(box, BABYLON.PhysicsImpostor.SphereImpostor, { mass: 0 }, this.scene)
+            box.material = new BABYLON.StandardMaterial("myMaterial", this.scene);
+            // box.material.alpha = 0
             this._collisionBoxes.push(box)
         })
-
+        this._bodyBox = new BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 2, updatable: true }, this.scene)
+        this._bodyBox.setPivotMatrix(new BABYLON.Matrix.Translation(0, 0.5, 0), false);
+        this._bodyBox.position = this.mesh.position
+        this._bodyBox.material = new BABYLON.StandardMaterial("myMaterial", this.scene);
+        this._bodyBox.material.alpha = 0.3
 
         //animatiom
         Object.keys(this._actions).forEach(chapter => {
@@ -46,7 +52,7 @@ export class Actor {
                 Object.keys(this._actions[chapter][section]).forEach(subsection => {
                     this._actions[chapter][section][subsection].forEach((anim, subsubsection, animsArray) => {
                         animsArray[subsubsection] = animationGroup.clone()
-                        // console.log(`${chapter}:${section}:${subsection}:${subsubsection}`)
+                            // console.log(`${chapter}:${section}:${subsection}:${subsubsection}`)
                         animsArray[subsubsection].normalize(Actor.actionSet()[chapter][section][subsection][subsubsection].start / this.fps, Actor.actionSet()[chapter][section][subsection][subsubsection].end / this.fps)
                     })
                     switch (chapter) {
@@ -171,37 +177,39 @@ export class Actor {
                                     case "jump":
                                         {
                                             switch (subsection) {
-                                                case "small": {
-                                                    this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
-                                                        if (this.isHit) {
-                                                            this._state.subsubsection = 1
-                                                        } else {
+                                                case "small":
+                                                    {
+                                                        this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
+                                                            if (this.isHit) {
+                                                                this._state.subsubsection = 1
+                                                            } else {
+                                                                this._state.subsubsection = 2
+                                                            }
+                                                        })
+
+                                                        this._actions[chapter][section][subsection][1].onAnimationEndObservable.add(() => {
                                                             this._state.subsubsection = 2
-                                                        }
-                                                    })
+                                                        })
+                                                        this._actions[chapter][section][subsection][2].onAnimationEndObservable.add(() => {
+                                                            this._state.chapter = "normal"
+                                                            this._state.subsection = "main"
+                                                            this._state.subsubsection = 0
+                                                        })
+                                                        break;
+                                                    }
+                                                default:
+                                                    {
+                                                        this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
+                                                            this._state.subsubsection = 1
+                                                        })
 
-                                                    this._actions[chapter][section][subsection][1].onAnimationEndObservable.add(() => {
-                                                        this._state.subsubsection = 2
-                                                    })
-                                                    this._actions[chapter][section][subsection][2].onAnimationEndObservable.add(() => {
-                                                        this._state.chapter = "normal"
-                                                        this._state.subsection = "main"
-                                                        this._state.subsubsection = 0
-                                                    })
-                                                    break;
-                                                }
-                                                default: {
-                                                    this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
-                                                        this._state.subsubsection = 1
-                                                    })
-
-                                                    this._actions[chapter][section][subsection][1].onAnimationEndObservable.add(() => {
-                                                        this._state.chapter = "normal"
-                                                        this._state.subsection = "main"
-                                                        this._state.subsubsection = 0
-                                                    })
-                                                    break;
-                                                }
+                                                        this._actions[chapter][section][subsection][1].onAnimationEndObservable.add(() => {
+                                                            this._state.chapter = "normal"
+                                                            this._state.subsection = "main"
+                                                            this._state.subsubsection = 0
+                                                        })
+                                                        break;
+                                                    }
                                             }
 
 
@@ -451,22 +459,22 @@ export class Actor {
                 },
                 squat: {
                     main: [{
-                        start: 801,
-                        end: 820,
-                        atk: 0,
-                        speed: 3
-                    },
-                    {
-                        start: 821,
-                        end: 880,
-                        atk: 0
-                    },
-                    {
-                        start: 1101,
-                        end: 1120,
-                        atk: 0,
-                        speed: 3
-                    }
+                            start: 801,
+                            end: 820,
+                            atk: 0,
+                            speed: 3
+                        },
+                        {
+                            start: 821,
+                            end: 880,
+                            atk: 0
+                        },
+                        {
+                            start: 1101,
+                            end: 1120,
+                            atk: 0,
+                            speed: 3
+                        }
                     ],
                     // forward: [{
                     //     start: 881,
@@ -486,7 +494,8 @@ export class Actor {
                         start: 101,
                         end: 109,
                         atk: 100,
-                        speed: 1.5
+                        speed: 1.5,
+                        boxes: [12]
                     }, {
                         start: 109,
                         end: 119,
@@ -500,7 +509,8 @@ export class Actor {
                     medium: [{
                         start: 131,
                         end: 150,
-                        atk: 200
+                        atk: 200,
+                        boxes: [7]
                     }, {
                         start: 150,
                         end: 160,
@@ -513,7 +523,8 @@ export class Actor {
                     large: [{
                         start: 171,
                         end: 197,
-                        atk: 300
+                        atk: 300,
+                        boxes: [12]
                     }, {
                         start: 197,
                         end: 207,
@@ -752,6 +763,9 @@ export class Actor {
     get collisionBoxes() {
         return this._collisionBoxes
     }
+    get bodyBox() {
+        return this._bodyBox
+    }
 
     stopAnimation() {
         Object.keys(this._actions).forEach((chapter => {
@@ -760,7 +774,7 @@ export class Actor {
                     this._actions[chapter][section][subsection].forEach((anim, subsubsection) => {
                         if (`${chapter}:${section}:${subsection}:${subsubsection}` != `${this._state["chapter"]}:${this._state["section"]}:${this._state["subsection"]}:${this._state["subsubsection"]}`) {
                             anim.stop()
-                        } else { }
+                        } else {}
                     })
                 }))
             }))
@@ -904,20 +918,42 @@ export class Actor {
             }
         }
 
+        {
+
+            this._bodyBox.position.x = this.mesh.position.x
+            this._bodyBox.position.y = this.mesh.position.y
+            this._bodyBox.position.z = this.mesh.position.z
+            if (this._state.section == "squat") {
+                this._bodyBox.scaling = new BABYLON.Vector3(1, 0.5, 1)
+                this._bodyBox.position.y -= 0.2
+            } else {
+                this._bodyBox.scaling = new BABYLON.Vector3(1, 1, 1)
+            }
+        }
 
         this.skeleton.bones.forEach((bone, index) => {
             this.collisionBoxes[index].PhysicsImpostor.syncImpostorWithBone(bone, this.mesh)
         })
-        this.collisionBoxes.forEach((thisBox) => {
-            this.opponent.collisionBoxes.forEach((oppoBox) => {
-                if (thisBox.intersectsMesh(oppoBox, true)) {
+        let attackBox = Actor.actionSet()[this._state.chapter][this._state.section][this._state.subsection][this._state.subsubsection].boxes
+        if (attackBox) {
+            attackBox.forEach((boxIndex) => {
+                if (this.collisionBoxes[boxIndex].intersectsMesh(this.opponent.bodyBox, true)) {
                     if (this._state.chapter == "attack") {
-
                         console.log("c")
                     }
                 }
             })
-        })
+        }
+        // this.collisionBoxes.forEach((thisBox) => {
+        //     this.opponent.collisionBoxes.forEach((oppoBox) => {
+        //         if (thisBox.intersectsMesh(oppoBox, true)) {
+        //             if (this._state.chapter == "attack") {
+
+        //                 console.log("c")
+        //             }
+        //         }
+        //     })
+        // })
 
     }
     setOpponent(opponent) {
