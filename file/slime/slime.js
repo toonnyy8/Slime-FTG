@@ -34,6 +34,8 @@ export class Actor {
 
         this.cumulativeDamage = 0
 
+        this.beInjuredObj = { atk: null, scale: null, beHitVector: BABYLON.Vector3.Zero() }
+
         //collision boxes
         this._collisionBoxes = []
         this.skeleton.bones.forEach((bone, index) => {
@@ -55,7 +57,7 @@ export class Actor {
                 Object.keys(this._actions[chapter][section]).forEach(subsection => {
                     this._actions[chapter][section][subsection].forEach((anim, subsubsection, animsArray) => {
                         animsArray[subsubsection] = animationGroup.clone()
-                            // console.log(`${chapter}:${section}:${subsection}:${subsubsection}`)
+                        // console.log(`${chapter}:${section}:${subsection}:${subsubsection}`)
                         animsArray[subsubsection].normalize(Actor.actionSet()[chapter][section][subsection][subsubsection].start / this.fps, Actor.actionSet()[chapter][section][subsection][subsubsection].end / this.fps)
                     })
                     let stateEqual = (subsubsection) => {
@@ -750,22 +752,22 @@ export class Actor {
                 },
                 squat: {
                     main: [{
-                            start: 801,
-                            end: 820,
-                            atk: 0,
-                            speed: 3
-                        },
-                        {
-                            start: 821,
-                            end: 880,
-                            atk: 0
-                        },
-                        {
-                            start: 1101,
-                            end: 1120,
-                            atk: 0,
-                            speed: 3
-                        }
+                        start: 801,
+                        end: 820,
+                        atk: 0,
+                        speed: 3
+                    },
+                    {
+                        start: 821,
+                        end: 880,
+                        atk: 0
+                    },
+                    {
+                        start: 1101,
+                        end: 1120,
+                        atk: 0,
+                        speed: 3
+                    }
                     ],
                     // forward: [{
                     //     start: 881,
@@ -922,26 +924,26 @@ export class Actor {
                         atk: 0
                     }],
                     large: [{
-                            start: 1041,
-                            end: 1051,
-                            atk: 0
-                        },
-                        {
-                            start: 1051,
-                            end: 1058,
-                            atk: 500,
-                            boxes: [12]
-                        },
-                        {
-                            start: 1058,
-                            end: 1071,
-                            atk: 0,
-                            speed: 2
-                        }, {
-                            start: 1071,
-                            end: 1100,
-                            atk: 0
-                        }
+                        start: 1041,
+                        end: 1051,
+                        atk: 0
+                    },
+                    {
+                        start: 1051,
+                        end: 1058,
+                        atk: 500,
+                        boxes: [12]
+                    },
+                    {
+                        start: 1058,
+                        end: 1071,
+                        atk: 0,
+                        speed: 2
+                    }, {
+                        start: 1071,
+                        end: 1100,
+                        atk: 0
+                    }
                     ]
                 }
             },
@@ -1069,16 +1071,16 @@ export class Actor {
                 },
                 reStand: {
                     main: [{
-                            start: 1300,
-                            end: 1301,
-                            atk: 0,
-                            speed: 0.1
-                        },
-                        {
-                            start: 1301,
-                            end: 1330,
-                            atk: 0
-                        }
+                        start: 1300,
+                        end: 1301,
+                        atk: 0,
+                        speed: 0.1
+                    },
+                    {
+                        start: 1301,
+                        end: 1330,
+                        atk: 0
+                    }
                     ]
                 }
             }
@@ -1116,7 +1118,7 @@ export class Actor {
                     this._actions[chapter][section][subsection].forEach((anim, subsubsection) => {
                         if (`${chapter}:${section}:${subsection}:${subsubsection}` != `${this._state["chapter"]}:${this._state["section"]}:${this._state["subsection"]}:${this._state["subsubsection"]}`) {
                             anim.stop()
-                        } else {}
+                        } else { }
                     })
                 }))
             }))
@@ -1128,8 +1130,9 @@ export class Actor {
         if (debug) {
             console.log(`${this._state.chapter}:${this._state.section}:${this._state.subsection}:${this._state.subsubsection}`)
         }
+
         this.stopAnimation()
-        this._actions[this._state.chapter][this._state.section][this._state.subsection][this._state.subsubsection].start(false, (Actor.actionSet()[this._state.chapter][this._state.section][this._state.subsection][this._state.subsubsection].speed || 1) /* * 0.5*/ )
+        this._actions[this._state.chapter][this._state.section][this._state.subsection][this._state.subsubsection].start(false, (Actor.actionSet()[this._state.chapter][this._state.section][this._state.subsection][this._state.subsubsection].speed || 1) /* * 0.5*/)
 
         if (`${this._state["chapter"]}:${this._state["section"]}:${this._state["subsection"]}` == "normal:stand:main") {
             this.vector.x = 0
@@ -1144,6 +1147,7 @@ export class Actor {
             case "normal":
                 {
                     this.isHit = false
+                    this.cumulativeDamage = 0
                     switch (this._state.section) {
                         case "stand":
                             {
@@ -1180,6 +1184,8 @@ export class Actor {
                 }
             case "attack":
                 {
+                    this.cumulativeDamage = 0
+
                     switch (this._state.section) {
                         case "stand":
                             {
@@ -1266,7 +1272,12 @@ export class Actor {
                 this.vector.y = 0
             } else {
                 if (`${this._state.chapter}:${this._state.section}:${this._state.subsection}:${this._state.subsubsection}` == "hitRecover:jump:large:0") {
-                    this.vector.y = 0
+                    if (this.beInjuredObj.beHitVector.x == 0 && this.beInjuredObj.beHitVector.y == 0) {
+                        this.vector.y = 0
+                    } else {
+                        this.vector.y -= 0.02
+
+                    }
                 } else {
                     this.vector.y -= 0.02
                 }
@@ -1324,18 +1335,22 @@ export class Actor {
                     if (this._state.chapter == "attack") {
                         if (boxIndex != "body") {
                             if (this.collisionBoxes[boxIndex].intersectsMesh(this.opponent.bodyBox, true)) {
-                                this.opponent.beInjured(atk, this._state.subsection, hitVector)
+                                this.opponent.setBeInjuredObj(atk, this._state.subsection, hitVector)
                                 this.isHit = true
                             }
                         } else {
                             if (this.bodyBox.intersectsMesh(this.opponent.bodyBox, true)) {
-                                this.opponent.beInjured(atk, this._state.subsection, hitVector)
+                                this.opponent.setBeInjuredObj(atk, this._state.subsection, hitVector)
                                 this.isHit = true
                             }
                         }
                     }
                 }
             })
+        }
+
+        if (this.beInjuredObj.atk != null) {
+            this.beInjured()
         }
 
         // this.collisionBoxes.forEach((thisBox) => {
@@ -1361,18 +1376,26 @@ export class Actor {
         return this.opponent.mesh.position.x > this.mesh.position.x ? "left" : "right"
     }
 
-    beInjured(atk = 100, scale = "small", beHitVector = BABYLON.Vector3.Zero()) {
-        if (beHitVector.y > 0) {
+    setBeInjuredObj(atk = 100, scale = "small", beHitVector = BABYLON.Vector3.Zero()) {
+        this.beInjuredObj = { atk: atk, scale: scale, beHitVector: beHitVector }
+    }
+
+    beInjured() {
+        if (this.beInjuredObj.beHitVector.y > 0) {
             this._state.section = "jump"
         }
         if (this._state.section != "reStand") {
             this._state.chapter = "hitRecover"
-            this._state.subsection = this._state.section == "jump" ? "large" : scale
+            this._state.subsection = this._state.section == "jump" ? "large" : this.beInjuredObj.scale
             this._state.subsubsection = 0
-            this.vector = this.vector.add(beHitVector)
-            this.mesh.position = this.mesh.position.add(beHitVector)
+            this.vector = this.vector.add(this.beInjuredObj.beHitVector)
+            this.mesh.position = this.mesh.position.add(this.beInjuredObj.beHitVector)
         }
-        this.cumulativeDamage += atk
-        console.log(atk)
+        this.cumulativeDamage += this.beInjuredObj.atk
+        console.log(this.beInjuredObj.atk)
+        console.log(this.vector)
+
+        this.beInjuredObj.atk = null
+        this.isHit = false
     }
 }
