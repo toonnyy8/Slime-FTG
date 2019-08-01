@@ -32,6 +32,8 @@ export class Actor {
 
         this.vector = BABYLON.Vector3.Zero()
 
+        this.cumulativeDamage = 0
+
         //collision boxes
         this._collisionBoxes = []
         this.skeleton.bones.forEach((bone, index) => {
@@ -321,7 +323,12 @@ export class Actor {
                                         {
                                             this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
                                                 if (stateEqual(0)) {
-                                                    this._state.subsubsection = 1
+                                                    if (this.cumulativeDamage < 500) {
+                                                        this._state.subsubsection = 1
+                                                    } else {
+                                                        this._state.subsection = "large"
+                                                        this._state.subsubsection = 1
+                                                    }
                                                 }
                                             })
 
@@ -1365,6 +1372,7 @@ export class Actor {
             this.vector = this.vector.add(beHitVector)
             this.mesh.position = this.mesh.position.add(beHitVector)
         }
+        this.cumulativeDamage += atk
         console.log(atk)
     }
 }
