@@ -912,7 +912,8 @@ export class Actor {
                         start: 1001,
                         end: 1018,
                         atk: 250,
-                        boxes: [12]
+                        boxes: [12],
+                        hitVector: [0.05, 0.2, 0]
                     }, {
                         start: 1018,
                         end: 1030,
@@ -932,7 +933,8 @@ export class Actor {
                         start: 1051,
                         end: 1058,
                         atk: 500,
-                        boxes: [12]
+                        boxes: [12],
+                        hitVector: [0, 0.3, 0]
                     },
                     {
                         start: 1058,
@@ -1134,7 +1136,10 @@ export class Actor {
         this.stopAnimation()
         this._actions[this._state.chapter][this._state.section][this._state.subsection][this._state.subsubsection].start(false, (Actor.actionSet()[this._state.chapter][this._state.section][this._state.subsection][this._state.subsubsection].speed || 1) /* * 0.5*/)
 
-        if (`${this._state["chapter"]}:${this._state["section"]}:${this._state["subsection"]}` == "normal:stand:main") {
+        // if (`${this._state["chapter"]}:${this._state["section"]}:${this._state["subsection"]}` == "normal:stand:main") {
+        //     this.vector.x = 0
+        // }
+        if (this.mesh.position.y == 0 && this._state.chapter != "attack") {
             this.vector.x = 0
         }
 
@@ -1377,6 +1382,7 @@ export class Actor {
     }
 
     setBeInjuredObj(atk = 100, scale = "small", beHitVector = BABYLON.Vector3.Zero()) {
+        beHitVector.x = this.faceTo == "left" ? beHitVector.x * -1 : beHitVector.x
         this.beInjuredObj = { atk: atk, scale: scale, beHitVector: beHitVector }
     }
 
