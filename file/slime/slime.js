@@ -124,6 +124,10 @@ export class Actor {
                             }
                         case "attack":
                             {
+                                this._actions[chapter][section][subsection][0].onAnimationGroupPlayObservable.add(() => {
+                                    setTimeout(() => { this.isHit = false }, 30)
+                                })
+
                                 switch (section) {
                                     case "stand":
                                         {
@@ -297,9 +301,14 @@ export class Actor {
                                                                 this._state.subsubsection = 1
                                                             }
                                                         })
-
                                                         this._actions[chapter][section][subsection][1].onAnimationEndObservable.add(() => {
                                                             if (stateEqual(1)) {
+                                                                this._state.subsubsection = 2
+                                                            }
+                                                        })
+
+                                                        this._actions[chapter][section][subsection][2].onAnimationEndObservable.add(() => {
+                                                            if (stateEqual(2)) {
                                                                 this._state.chapter = "normal"
                                                                 this._state.subsection = "main"
                                                                 this._state.subsubsection = 0
@@ -358,8 +367,14 @@ export class Actor {
                                         {
                                             this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
                                                 if (stateEqual(0)) {
-                                                    this._state.subsubsection = 1
+                                                    if (this.cumulativeDamage < 500) {
+                                                        this._state.subsubsection = 1
+                                                    } else {
+                                                        this._state.subsection = "large"
+                                                        this._state.subsubsection = 1
+                                                    }
                                                 }
+
                                             })
 
                                             if (subsection != "large") {
@@ -438,6 +453,28 @@ export class Actor {
                                 break;
                                 break;
                             }
+                        case "defense":
+                            {
+                                this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
+                                    this._state.subsubsection = 1
+                                })
+                                this._actions[chapter][section][subsection][1].onAnimationEndObservable.add(() => {
+                                    this._state.chapter = "normal"
+                                    this._state.subsection = "main"
+                                    if (this._state.section == "stand") {
+                                        this._state.subsubsection = 0
+                                    } else if (this._state.section == "squat") {
+                                        if (this.keyDown.squat) {
+                                            this._state.subsubsection = 1
+                                        } else {
+                                            this._state.subsubsection = 2
+                                        }
+                                    } else if (this._state.section == "jump") {
+                                        this._state.subsubsection = 0
+                                    }
+                                })
+                                break;
+                            }
                         default:
                             break;
                     }
@@ -456,8 +493,8 @@ export class Actor {
                             if (this._state.chapter == "normal") {
                                 if (this._state.section == "stand") {
                                     this._state.subsection = this.faceTo == "right" ? "forward" : "backward"
-                                    this.keyDown.right = true
                                 }
+                                this.keyDown.right = true
                             }
                         }
                         break;
@@ -468,8 +505,8 @@ export class Actor {
                             if (this._state.chapter == "normal") {
                                 if (this._state.section == "stand") {
                                     this._state.subsection = this.faceTo == "left" ? "forward" : "backward"
-                                    this.keyDown.left = true
                                 }
+                                this.keyDown.left = true
                             }
                         }
                         break;
@@ -532,7 +569,7 @@ export class Actor {
                                                     if (this._state.section == "jump") {
                                                         this.jumpAttackNum += 1
                                                     }
-                                                    this.isHit = false
+                                                    // this.isHit = false
                                                 }
                                             }
                                         }
@@ -585,7 +622,7 @@ export class Actor {
                                             if (this._state.section == "jump") {
                                                 this.jumpAttackNum += 2
                                             }
-                                            this.isHit = false
+                                            // this.isHit = false
                                         }
                                     }
                                 }
@@ -617,7 +654,7 @@ export class Actor {
                                             if (this._state.section == "jump") {
                                                 this.jumpAttackNum += 3
                                             }
-                                            this.isHit = false
+                                            // this.isHit = false
                                         }
                                     }
                                 }
@@ -804,6 +841,7 @@ export class Actor {
                         start: 131,
                         end: 150,
                         atk: 200,
+                        speed: 2.5,
                         boxes: [7]
                     }, {
                         start: 150,
@@ -853,28 +891,43 @@ export class Actor {
                         atk: 0,
                         speed: 1.5
                     }],
-                    medium: [{
-                        start: 471,
-                        end: 493,
-                        atk: 240,
-                        boxes: [12]
-                    }, {
-                        start: 493,
-                        end: 510,
-                        atk: 0,
-                    }],
-                    large: [{
-                        start: 511,
-                        end: 555,
-                        atk: 500,
-                        speed: 1.8,
-                        boxes: [7, 6]
-                    }, {
-                        start: 555,
-                        end: 570,
-                        atk: 0,
-                        speed: 1.2
-                    }],
+                    medium: [
+                        {
+                            start: 471,
+                            end: 485,
+                            atk: 0,
+                            speed: 1.5
+                        }, {
+                            start: 485,
+                            end: 493,
+                            atk: 240,
+                            speed: 1.5,
+                            boxes: [12],
+                            hitVector: [0, 0.25, 0]
+                        }, {
+                            start: 493,
+                            end: 510,
+                            atk: 0,
+                        }],
+                    large: [
+                        {
+                            start: 511,
+                            end: 520,
+                            atk: 0,
+                            speed: 1.8
+                        }, {
+                            start: 520,
+                            end: 555,
+                            atk: 500,
+                            speed: 4,
+                            boxes: [7, 6],
+                            hitVector: [0, -0.5, 0]
+                        }, {
+                            start: 555,
+                            end: 570,
+                            atk: 0,
+                            speed: 1.2
+                        }],
                     fall: [{
                         start: 571,
                         end: 580,
@@ -990,7 +1043,7 @@ export class Actor {
                         start: 241,
                         end: 250,
                         atk: 0,
-                        speed: 1
+                        speed: 0.8
                     }, {
                         start: 250,
                         end: 260,
@@ -1000,7 +1053,7 @@ export class Actor {
                         start: 261,
                         end: 275,
                         atk: 0,
-                        speed: 1
+                        speed: 0.8
                     }, {
                         start: 275,
                         end: 290,
@@ -1010,7 +1063,7 @@ export class Actor {
                         start: 291,
                         end: 310,
                         atk: 0,
-                        speed: 1
+                        speed: 0.8
                     }, {
                         start: 310,
                         end: 330,
@@ -1128,7 +1181,9 @@ export class Actor {
     }
 
     tick(debug) {
-
+        if (debug) {
+            // console.log(this.vector)
+        }
         if (debug) {
             console.log(`${this._state.chapter}:${this._state.section}:${this._state.subsection}:${this._state.subsubsection}`)
         }
@@ -1330,10 +1385,11 @@ export class Actor {
             this.collisionBoxes[index].PhysicsImpostor.syncImpostorWithBone(bone, this.mesh)
         })
         let attackBox = Actor.actionSet()[this._state.chapter][this._state.section][this._state.subsection][this._state.subsubsection].boxes
-        if (attackBox) {
+        if (attackBox && !this.opponent.isInvincible) {
             attackBox.forEach((boxIndex) => {
                 let hitVector = Actor.actionSet()[this._state.chapter][this._state.section][this._state.subsection][this._state.subsubsection].hitVector || [0, 0, 0]
                 hitVector = new BABYLON.Vector3(...hitVector)
+                hitVector.x = this.faceTo == "left" ? hitVector.x : hitVector.x * -1
 
                 let atk = Actor.actionSet()[this._state.chapter][this._state.section][this._state.subsection][this._state.subsubsection].atk
                 if (!this.isHit) {
@@ -1380,28 +1436,49 @@ export class Actor {
     get faceTo() {
         return this.opponent.mesh.position.x > this.mesh.position.x ? "left" : "right"
     }
+    get isInvincible() {
+        return ((this._state.section == "reStand") || (`${this._state.chapter}:${this._state.subsection}` == "hitRecover:large" && this._state.subsubsection >= 1)) && (this.mesh.position.y <= 0)
+    }
 
     setBeInjuredObj(atk = 100, scale = "small", beHitVector = BABYLON.Vector3.Zero()) {
-        beHitVector.x = this.faceTo == "left" ? beHitVector.x * -1 : beHitVector.x
-        this.beInjuredObj = { atk: atk, scale: scale, beHitVector: beHitVector }
+        // beHitVector.x = this.faceTo == "left" ? beHitVector.x * -1 : beHitVector.x
+        if (this.keyDown.left != this.keyDown.right) {
+            if ((this.keyDown.left && new BABYLON.Vector3(0, Math.PI, 0).toQuaternion().equals(this.mesh.rotationQuaternion)) || (this.keyDown.right && new BABYLON.Vector3(0, 0, 0).toQuaternion().equals(this.mesh.rotationQuaternion))) {
+                this._state.chapter = "defense"
+                this._state.subsection = "main"
+                this._state.subsubsection = 0
+            } else { this.beInjuredObj = { atk: atk, scale: scale, beHitVector: beHitVector } }
+        } else {
+            this.beInjuredObj = { atk: atk, scale: scale, beHitVector: beHitVector }
+        }
+        if (beHitVector.x == 0) {
+            this.mesh.position.x += this.faceTo == "left" ? -0.2 : 0.2
+        }
+        // if (this._state.subsection != "backward") {
+        //     this.beInjuredObj = { atk: atk, scale: scale, beHitVector: beHitVector }
+        // } else {
+        //     this._state.chapter = "defense"
+        //     this._state.subsection = "main"
+        //     this._state.subsubsection = 0
+        // }
     }
 
     beInjured() {
         if (this.beInjuredObj.beHitVector.y > 0) {
             this._state.section = "jump"
         }
-        if (this._state.section != "reStand") {
-            this._state.chapter = "hitRecover"
-            this._state.subsection = this._state.section == "jump" ? "large" : this.beInjuredObj.scale
-            this._state.subsubsection = 0
-            this.vector = this.vector.add(this.beInjuredObj.beHitVector)
-            this.mesh.position = this.mesh.position.add(this.beInjuredObj.beHitVector)
-        }
+        this._state.chapter = "hitRecover"
+        this._state.subsection = this._state.section == "jump" ? "large" : this.beInjuredObj.scale
+        this._state.subsubsection = 0
+        this.vector = this.beInjuredObj.beHitVector
+        this.mesh.position = this.mesh.position.add(this.beInjuredObj.beHitVector)
         this.cumulativeDamage += this.beInjuredObj.atk
+
         console.log(this.beInjuredObj.atk)
         console.log(this.vector)
 
-        this.beInjuredObj.atk = null
         this.isHit = false
+        this.beInjuredObj.atk = null
+        // this.isHit = false
     }
 }

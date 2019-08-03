@@ -87,7 +87,7 @@ function createScene() {
 
             engine.runRenderLoop(() => {
                 player1.tick(false)
-                player2.tick(false)
+                player2.tick(true)
                 scene.render()
                 if (player1.isHit || player2.isHit) {
                     camera.setTarget(new BABYLON.Vector3(-0.06 + Math.random() * 0.12, 3.94 + Math.random() * 0.12, 0));
