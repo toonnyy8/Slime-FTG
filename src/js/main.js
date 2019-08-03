@@ -50,7 +50,13 @@ function createScene() {
         // meshes[0].position.z = -2
         let animationGroup = animationGroups[0] //.start(false)
         animationGroup.stop()
-        player1 = new slime.Actor({ mesh: meshes[0], animationGroup: animationGroups[0], skeleton: skeletons[0], scene: scene })
+        player1 = new slime.Actor({
+            mesh: meshes[0],
+            materialMesh: meshes[1],
+            animationGroup: animationGroups[0],
+            skeleton: skeletons[0],
+            scene: scene
+        })
         // Create a skeleton viewer for the mesh
         var skeletonViewer = new BABYLON.Debug.SkeletonViewer(skeletons[0], meshes[0], scene);
         skeletonViewer.isEnabled = true; // Enable it
@@ -71,6 +77,7 @@ function createScene() {
             animationGroup.stop()
             player2 = new slime.Actor({
                 mesh: meshes[0],
+                materialMesh: meshes[1],
                 animationGroup: animationGroups[0],
                 skeleton: skeletons[0],
                 keySet: { jump: "ArrowUp", squat: "ArrowDown", left: "ArrowLeft", right: "ArrowRight", attack: { small: "1", medium: "2", large: "3" } }
@@ -87,7 +94,7 @@ function createScene() {
 
             engine.runRenderLoop(() => {
                 player1.tick(false)
-                player2.tick(true)
+                player2.tick(false)
                 scene.render()
                 if (player1.isHit || player2.isHit) {
                     camera.setTarget(new BABYLON.Vector3(-0.06 + Math.random() * 0.12, 3.94 + Math.random() * 0.12, 0));
