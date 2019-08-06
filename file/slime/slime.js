@@ -52,14 +52,14 @@ export class Actor {
             let box = new BABYLON.MeshBuilder.CreateBox("box", { size: 0.2, updatable: true }, this.scene)
             box.PhysicsImpostor = new BABYLON.PhysicsImpostor(box, BABYLON.PhysicsImpostor.SphereImpostor, { mass: 0 }, this.scene)
             box.material = new BABYLON.StandardMaterial("myMaterial", this.scene);
-            // box.material.alpha = 0
+            box.material.alpha = 0
             this._collisionBoxes.push(box)
         })
         this._bodyBox = new BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 2, updatable: true }, this.scene)
         this._bodyBox.setPivotMatrix(new BABYLON.Matrix.Translation(0, 0.5, 0), false);
         this._bodyBox.position = this.mesh.position
         this._bodyBox.material = new BABYLON.StandardMaterial("myMaterial", this.scene);
-        this._bodyBox.material.alpha = 0.3
+        this._bodyBox.material.alpha = 0
 
         //animatiom
         Object.keys(this._actions).forEach(chapter => {
@@ -617,7 +617,7 @@ export class Actor {
                                     }
                                 case "attack":
                                     {
-                                        if (this._state.subsection != "small") {
+                                        if (this._state.subsection != "small" && this._state.subsection != "fall") {
                                             if (this.isHit) {
                                                 if (this._state.subsubsection == Actor.actionSet()[this._state.chapter][this._state.section][this._state.subsection].length - 1) {
                                                     this._state.chapter = "attack"
@@ -691,7 +691,7 @@ export class Actor {
                                     }
                                 case "attack":
                                     {
-                                        if (this._state.subsection != "medium") {
+                                        if (this._state.subsection != "medium" && this._state.subsection != "fall") {
                                             if (this.isHit) {
                                                 if (this._state.subsubsection == Actor.actionSet()[this._state.chapter][this._state.section][this._state.subsection].length - 1) {
                                                     this._state.chapter = "attack"
@@ -756,7 +756,7 @@ export class Actor {
                                     }
                                 case "attack":
                                     {
-                                        if (this._state.subsection != "large") {
+                                        if (this._state.subsection != "large" && this._state.subsection != "fall") {
                                             if (this.isHit) {
                                                 if (this._state.subsubsection == Actor.actionSet()[this._state.chapter][this._state.section][this._state.subsection].length - 1) {
                                                     this._state.chapter = "attack"
