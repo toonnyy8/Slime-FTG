@@ -38,6 +38,24 @@ function createScene() {
     light.specular = new BABYLON.Color3(1, 1, 1);
     light.groundColor = new BABYLON.Color3(0.4, 0.4, 0.5);
 
+    let hpMaterial = new BABYLON.StandardMaterial("hpMaterial", scene);
+    hpMaterial.diffuseColor = new BABYLON.Color3(1, 0.3, 0.3)
+    hpMaterial.specularColor = new BABYLON.Color3(1, 0.3, 0.3)
+    hpMaterial.emissiveColor = new BABYLON.Color3(1, 0.3, 0.3)
+    hpMaterial.ambientColor = new BABYLON.Color3(1, 0.3, 0.3)
+
+    let HPBar = { p1: BABYLON.MeshBuilder.CreateBox("P1_hp", { size: 0.5, width: 8 }), p2: BABYLON.MeshBuilder.CreateBox("P2_hp", { size: 0.5, width: 8 }) }
+    HPBar.p1.setPivotMatrix(new BABYLON.Matrix.Translation(-3, 0, 0), false);
+    HPBar.p1.position.y = 9
+    HPBar.p1.position.x = 9
+    HPBar.p1.material = hpMaterial
+
+
+    HPBar.p2.setPivotMatrix(new BABYLON.Matrix.Translation(3, 0, 0), false);
+    HPBar.p2.position.y = 9
+    HPBar.p2.position.x = -9
+    HPBar.p2.material = hpMaterial
+
     BABYLON.SceneLoader.OnPluginActivatedObservable.addOnce(loader => {
         loader.animationStartMode = BABYLON.GLTFLoaderAnimationStartMode.NONE
     })
@@ -55,7 +73,9 @@ function createScene() {
             materialMesh: meshes[1],
             animationGroup: animationGroups[0],
             skeleton: skeletons[0],
-            scene: scene
+            scene: scene,
+            startPosition: new BABYLON.Vector3(5, 0, 0),
+            startRotationQuaternion: new BABYLON.Vector3(0, Math.PI, 0).toQuaternion()
         })
         // Create a skeleton viewer for the mesh
         var skeletonViewer = new BABYLON.Debug.SkeletonViewer(skeletons[0], meshes[0], scene);
@@ -80,14 +100,10 @@ function createScene() {
                 materialMesh: meshes[1],
                 animationGroup: animationGroups[0],
                 skeleton: skeletons[0],
-                keySet: { jump: "ArrowUp", squat: "ArrowDown", left: "ArrowLeft", right: "ArrowRight", attack: { small: "1", medium: "2", large: "3" } }
+                keySet: { jump: "ArrowUp", squat: "ArrowDown", left: "ArrowLeft", right: "ArrowRight", attack: { small: "1", medium: "2", large: "3" } },
+                startPosition: new BABYLON.Vector3(-5, 0, 0),
+                startRotationQuaternion: new BABYLON.Vector3(0, 0, 0).toQuaternion()
             })
-
-            player1.mesh.position.x = 5
-            player2.mesh.position.x = -5
-
-            player1.mesh.rotationQuaternion = new BABYLON.Vector3(0, Math.PI, 0).toQuaternion()
-            player2.mesh.rotationQuaternion = new BABYLON.Vector3(0, 0, 0).toQuaternion()
 
             player1.setOpponent(player2)
             player2.setOpponent(player1)
@@ -100,6 +116,12 @@ function createScene() {
                     camera.setTarget(new BABYLON.Vector3(-0.06 + Math.random() * 0.12, 3.94 + Math.random() * 0.12, 0));
                 } else {
                     camera.setTarget(new BABYLON.Vector3(0, 4, 0));
+                }
+                HPBar.p1.scaling.x = player1.HP / 3000
+                HPBar.p2.scaling.x = player2.HP / 3000
+                if (player1.HP <= 0 || player2.HP <= 0) {
+                    player1.restart()
+                    player2.restart()
                 }
             })
             /*

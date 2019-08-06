@@ -3,17 +3,16 @@ import fs from 'fs'
 import * as BABYLON from "babylonjs"
 
 export class Actor {
-    constructor({ mesh, materialMesh, animationGroup, skeleton, scene, keySet = { jump: "w", squat: "s", left: "a", right: "d", attack: { small: "j", medium: "k", large: "l" } }, fps = 60 }) {
+    constructor({ mesh, materialMesh, animationGroup, skeleton, startPosition, startRotationQuaternion, scene, keySet = { jump: "w", squat: "s", left: "a", right: "d", attack: { small: "j", medium: "k", large: "l" } }, fps = 60 }) {
         this._fps = fps && !Number.isNaN(fps - 0) ? fps : this.fps
         this._actions = Actor.actionSet()
-        this.keyBuffer = []
-        this._mainState = "normal"
-        this._detailState = "stand"
         this._state = { chapter: "normal", section: "stand", subsection: "main", subsubsection: 0 }
         this._animationGroup = animationGroup
         this._mesh = mesh
         this._materialMesh = materialMesh
         this._skeleton = skeleton
+        this._startPosition = startPosition
+        this._startRotationQuaternion = startRotationQuaternion
         this._scene = scene
         this._opponent = null
         this.keyDown = {
@@ -31,11 +30,16 @@ export class Actor {
         this.isHit = false
         this.jumpTimes = 0
 
+        this.HP = 3000
+        this.beHitNum = 0
+
         this.vector = BABYLON.Vector3.Zero()
+        this.mesh.position = this._startPosition.clone()
+        this.mesh.rotationQuaternion = this._startRotationQuaternion.clone()
 
         this.cumulativeDamage = 0
 
-        this.perfectDefense = -1
+        this.perfectDefenseTime = -1
         this.isPD = false
 
         this.beInjuredObj = { atk: null, scale: null, beHitVector: BABYLON.Vector3.Zero() }
@@ -300,6 +304,34 @@ export class Actor {
                                                         })
                                                         break;
                                                     }
+                                                case "fall":
+                                                    {
+                                                        this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
+                                                            if (stateEqual(0)) {
+                                                                this._state.subsubsection = 1
+                                                            }
+                                                        })
+
+                                                        this._actions[chapter][section][subsection][1].onAnimationEndObservable.add(() => {
+                                                            if (stateEqual(1)) {
+                                                                if (this.mesh.position.y <= 0) {
+                                                                    this._state.subsubsection = 2
+                                                                } else {
+                                                                    this.isHit = false
+                                                                    this._state.subsubsection = 1
+                                                                }
+                                                            }
+                                                        })
+                                                        this._actions[chapter][section][subsection][2].onAnimationEndObservable.add(() => {
+                                                            if (stateEqual(2)) {
+                                                                this._state.chapter = "normal"
+                                                                this._state.subsection = "main"
+                                                                this._state.subsubsection = 0
+                                                                this.isHit = false
+                                                            }
+                                                        })
+                                                        break;
+                                                    }
                                                 default:
                                                     {
                                                         this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
@@ -355,6 +387,7 @@ export class Actor {
                                                         this._state.subsubsection = 0
                                                         this._state.chapter = "normal"
                                                         this._state.subsection = "main"
+                                                        this.beHitNum = 0
                                                     }
                                                 })
                                             } else {
@@ -363,6 +396,7 @@ export class Actor {
                                                         this._state.section = "reStand"
                                                         this._state.subsection = "main"
                                                         this._state.subsubsection = 0
+                                                        this.beHitNum = 0
                                                     }
                                                 })
                                             }
@@ -426,7 +460,7 @@ export class Actor {
                                                     this._state.section = "reStand"
                                                     this._state.subsection = "main"
                                                     this._state.subsubsection = 0
-
+                                                    this.beHitNum = 0
                                                 }
                                             })
 
@@ -449,6 +483,7 @@ export class Actor {
                                                         this._state.section = "stand"
                                                     }
                                                     this._state.subsubsection = 0
+                                                    this.beHitNum = 0
                                                 }
                                             })
                                             break;
@@ -456,7 +491,6 @@ export class Actor {
                                     default:
                                         break;
                                 }
-                                break;
                                 break;
                             }
                         case "defense":
@@ -514,7 +548,7 @@ export class Actor {
                                 }
                                 this.keyDown.right = true
                                 if (this.faceTo == "left") {
-                                    this.perfectDefense = 3
+                                    this.perfectDefenseTime = 3
                                 }
                             }
                         }
@@ -529,7 +563,7 @@ export class Actor {
                                 }
                                 this.keyDown.left = true
                                 if (this.faceTo == "right") {
-                                    this.perfectDefense = 3
+                                    this.perfectDefenseTime = 3
                                 }
                             }
                         }
@@ -559,8 +593,8 @@ export class Actor {
                                     this._state.subsection = "main"
                                     this._state.subsubsection = 0
                                 }
-                                this.keyDown.squat = true
-                            }
+
+                            } this.keyDown.squat = true
                         }
                         break;
                     }
@@ -707,7 +741,11 @@ export class Actor {
                                     {
                                         if (this.jumpAttackNum < 5) {
                                             this._state.chapter = "attack"
-                                            this._state.subsection = "large"
+                                            if (this.keyDown.squat && this._state.section == "jump") {
+                                                this._state.subsection = "fall"
+                                            } else {
+                                                this._state.subsection = "large"
+                                            }
                                             this._state.subsubsection = 0
                                             this.keyDown.attack.large = true
                                             if (this._state.section == "jump") {
@@ -722,7 +760,11 @@ export class Actor {
                                             if (this.isHit) {
                                                 if (this._state.subsubsection == Actor.actionSet()[this._state.chapter][this._state.section][this._state.subsection].length - 1) {
                                                     this._state.chapter = "attack"
-                                                    this._state.subsection = "large"
+                                                    if (this.keyDown.squat && this._state.section == "jump") {
+                                                        this._state.subsection = "fall"
+                                                    } else {
+                                                        this._state.subsection = "large"
+                                                    }
                                                     this._state.subsubsection = 0
                                                     this.keyDown.attack.large = true
                                                     if (this._state.section == "jump") {
@@ -743,7 +785,11 @@ export class Actor {
                                         if (this.isPD) {
                                             if (this.jumpAttackNum < 5) {
                                                 this._state.chapter = "attack"
-                                                this._state.subsection = "large"
+                                                if (this.keyDown.squat && this._state.section == "jump") {
+                                                    this._state.subsection = "fall"
+                                                } else {
+                                                    this._state.subsection = "large"
+                                                }
                                                 this._state.subsubsection = 0
                                                 this.keyDown.attack.large = true
                                                 if (this._state.section == "jump") {
@@ -1029,17 +1075,22 @@ export class Actor {
                     fall: [{
                         start: 571,
                         end: 580,
-                        atk: 50,
-                        boxes: [1]
+                        atk: 75,
+                        boxes: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                        hitVector: [-0.1, 0, 0]
                     }, {
                         start: 581,
                         end: 600,
-                        atk: 50,
-                        boxes: [1]
+                        atk: 75,
+                        speed: 10,
+                        boxes: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                        hitVector: [-0.1, 0, 0]
                     }, {
                         start: 601,
                         end: 630,
-                        atk: 0
+                        atk: 20,
+                        speed: 2, boxes: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                        hitVector: [-0.1, 0, 0]
                     }]
                 },
                 squat: {
@@ -1084,7 +1135,7 @@ export class Actor {
                     {
                         start: 1051,
                         end: 1058,
-                        atk: 500,
+                        atk: 350,
                         boxes: [12],
                         hitVector: [0.00001, 0.32, 0]
                     },
@@ -1283,7 +1334,7 @@ export class Actor {
     }
 
     tick(debug) {
-        this.perfectDefense -= 1
+        this.perfectDefenseTime -= 1
 
         if (debug) {
             // console.log(this.vector)
@@ -1377,9 +1428,13 @@ export class Actor {
                         case "jump":
                             {
                                 if (this.mesh.position.y <= 0) {
-                                    this._state.chapter = "normal"
-                                    this._state.subsection = "main"
-                                    this._state.subsubsection = 0
+                                    if (this._state.subsection == "fall") {
+
+                                    } else {
+                                        this._state.chapter = "normal"
+                                        this._state.subsection = "main"
+                                        this._state.subsubsection = 0
+                                    }
                                 }
                                 break;
                             }
@@ -1432,7 +1487,7 @@ export class Actor {
             }
         }
         if (this.mesh.position.y > 0) {
-            if (this.isHit) {
+            if (this.isHit && this._state.subsection != "fall") {
                 this.vector.y = 0
             } else {
                 if (`${this._state.chapter}:${this._state.section}:${this._state.subsection}:${this._state.subsubsection}` == "hitRecover:jump:large:0") {
@@ -1442,6 +1497,9 @@ export class Actor {
                         this.vector.y -= 0.02
 
                     }
+                } else if (this._state.subsection == "fall") {
+                    this.vector.y -= 0.04
+                    this.vector.x = 0
                 } else {
                     this.vector.y -= 0.02
                 }
@@ -1480,6 +1538,9 @@ export class Actor {
             if (this._state.section == "squat") {
                 this._bodyBox.scaling = new BABYLON.Vector3(1, 0.5, 1)
                 this._bodyBox.position.y -= 0.2
+            } else if (this._state.subsection == "fall") {
+                this._bodyBox.scaling = new BABYLON.Vector3(0.2, 1.5, 0.2)
+                this._bodyBox.position.y += 0.4
             } else {
                 this._bodyBox.scaling = new BABYLON.Vector3(1, 1, 1)
             }
@@ -1553,7 +1614,7 @@ export class Actor {
             this._state.chapter = "defense"
             this._state.subsection = "main"
             this._state.subsubsection = 0
-            if (this.perfectDefense >= 0) {
+            if (this.perfectDefenseTime >= 0) {
                 this.isPD = true
 
                 let tempM = new BABYLON.StandardMaterial("material", this.scene)
@@ -1564,9 +1625,11 @@ export class Actor {
 
                 this.materialMesh.material = tempM
                 console.log("perfect")
+            } else {
+                this.HP -= atk / 5
             }
         } else {
-            this.beInjuredObj = { atk: atk, scale: scale, beHitVector: beHitVector }
+            this.beInjuredObj = { atk: atk, scale: scale == "fall" ? "small" : scale, beHitVector: beHitVector }
         }
         if (beHitVector.x == 0) {
             this.mesh.position.x += this.faceTo == "left" ? -0.2 : 0.2
@@ -1591,11 +1654,32 @@ export class Actor {
         this.mesh.position = this.mesh.position.add(this.beInjuredObj.beHitVector)
         this.cumulativeDamage += this.beInjuredObj.atk
 
-        console.log(this.beInjuredObj.atk)
+        this.beHitNum += 1
+        this.HP -= this.beInjuredObj.atk / this.beHitNum
+        console.log(this.HP)
         console.log(this.vector)
 
         this.isHit = false
         this.beInjuredObj.atk = null
         // this.isHit = false
+    }
+
+    restart() {
+        this.jumpAttackNum = 0
+        this.isHit = false
+        this.jumpTimes = 0
+        this._state.chapter = "normal"
+        this._state.section = "stand"
+        this._state.subsection = "main"
+        this._state.subsubsection = 0
+        this.mesh.position = this._startPosition.clone()
+        this.mesh.rotationQuaternion = this._startRotationQuaternion.clone()
+        this.vector = new BABYLON.Vector3.Zero()
+        this.isPD = false
+        this.perfectDefenseTime = -1
+        this.HP = 3000
+        this.beHitNum = 0
+        this.beInjuredObj = { atk: null, scale: null, beHitVector: BABYLON.Vector3.Zero() }
+        this.cumulativeDamage = 0
     }
 }
