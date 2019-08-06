@@ -498,7 +498,7 @@ export class Actor {
                                 this._actions[chapter][section][subsection][0].onAnimationGroupPlayObservable.add(() => {
                                     setTimeout(() => {
                                         this.materialMesh.material = this.material
-                                    }, 50)
+                                    }, 100)
                                 })
 
                                 this._actions[chapter][section][subsection][0].onAnimationEndObservable.add(() => {
@@ -548,7 +548,7 @@ export class Actor {
                                 }
                                 this.keyDown.right = true
                                 if (this.faceTo == "left") {
-                                    this.perfectDefenseTime = 3
+                                    this.perfectDefenseTime = 6
                                 }
                             }
                         }
@@ -563,7 +563,7 @@ export class Actor {
                                 }
                                 this.keyDown.left = true
                                 if (this.faceTo == "right") {
-                                    this.perfectDefenseTime = 3
+                                    this.perfectDefenseTime = 6
                                 }
                             }
                         }
@@ -985,7 +985,7 @@ export class Actor {
                         start: 131,
                         end: 150,
                         atk: 200,
-                        speed: 2.5,
+                        speed: 2,
                         boxes: [7]
                     }, {
                         start: 150,
@@ -1644,14 +1644,17 @@ export class Actor {
     }
 
     beInjured() {
-        if (this.beInjuredObj.beHitVector.y > 0) {
-            this._state.section = "jump"
+        if (!(this._state.chapter == "attack" && this._state.subsection == "large" && this._state.subsubsection <= 1)) {
+            if (this.beInjuredObj.beHitVector.y > 0) {
+                this._state.section = "jump"
+            }
+            this._state.chapter = "hitRecover"
+            this._state.subsection = this._state.section == "jump" ? "large" : this.beInjuredObj.scale
+            this._state.subsubsection = 0
+            this.vector = this.beInjuredObj.beHitVector
+            this.mesh.position = this.mesh.position.add(this.beInjuredObj.beHitVector)
+            this.isHit = false
         }
-        this._state.chapter = "hitRecover"
-        this._state.subsection = this._state.section == "jump" ? "large" : this.beInjuredObj.scale
-        this._state.subsubsection = 0
-        this.vector = this.beInjuredObj.beHitVector
-        this.mesh.position = this.mesh.position.add(this.beInjuredObj.beHitVector)
         this.cumulativeDamage += this.beInjuredObj.atk
 
         this.beHitNum += 1
@@ -1659,7 +1662,6 @@ export class Actor {
         console.log(this.HP)
         console.log(this.vector)
 
-        this.isHit = false
         this.beInjuredObj.atk = null
         // this.isHit = false
     }
