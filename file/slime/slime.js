@@ -580,6 +580,19 @@ export class Actor {
                                 this.vector.y = 0.4
                                 this.mesh.position.y += 0.01
                                 this.jumpTimes += 1
+
+                                if (this.faceTo == "left") {
+                                    this.mesh.rotationQuaternion = new BABYLON.Vector3(0, 0, 0).toQuaternion()
+                                } else {
+                                    this.mesh.rotationQuaternion = new BABYLON.Vector3(0, Math.PI, 0).toQuaternion()
+                                }
+                                if (this.keyDown.left != this.keyDown.right) {
+                                    if (this.keyDown.left) {
+                                        this.vector.x = this.faceTo == "left" ? 0.1 : 0.075
+                                    } else if (this.keyDown.right) {
+                                        this.vector.x = this.faceTo == "right" ? -0.1 : -0.075
+                                    }
+                                }
                             }
                         }
                         break;
