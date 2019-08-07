@@ -1,5 +1,5 @@
 {
-  "name": "babylonTest",
+  "name": "slime-ftg",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -18,5 +18,14 @@
     "babylonjs-loaders": "^4.0.3",
     "cannon": "^0.6.2",
     "parcel": "^1.12.3"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/toonnyy8/Slime-FTG.git"
+  },
+  "bugs": {
+    "url": "https://github.com/toonnyy8/Slime-FTG/issues"
+  },
+  "homepage": "https://github.com/toonnyy8/Slime-FTG#readme"
 }
