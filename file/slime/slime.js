@@ -1292,7 +1292,7 @@ export class Actor {
         }
     }
     static url() {
-        return URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime/slime2.glb')]))
+        return URL.createObjectURL(new Blob([fs.readFileSync(__dirname + '../../../file/slime/slime.glb')]))
     }
     get fps() {
         return this._fps || 60

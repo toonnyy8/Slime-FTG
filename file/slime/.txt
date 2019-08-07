@@ -1,5 +1,0 @@
-walk:1~30
-jump up:31~40
-jump down:41~50
-jump:51~70
-stand:71~110
