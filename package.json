@@ -1,31 +1,31 @@
 {
-  "name": "slime-ftg",
-  "version": "1.0.4",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "parcel index.html -p 8080 --open",
-    "build": "parcel build --no-content-hash index.html --out-dir build --public-url=./ "
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@babel/polyfill": "^7.4.4",
-    "babylonjs": "^4.0.3",
-    "babylonjs-gui": "^4.0.3",
-    "babylonjs-loaders": "^4.0.3",
-    "cannon": "^0.6.2",
-    "parcel": "^1.12.3"
-  },
-  "devDependencies": {},
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/toonnyy8/Slime-FTG.git"
-  },
-  "bugs": {
-    "url": "https://github.com/toonnyy8/Slime-FTG/issues"
-  },
-  "homepage": "https://github.com/toonnyy8/Slime-FTG#readme"
+    "name": "slime-ftg",
+    "version": "1.0.5",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev": "parcel index.html -p 8080 --open",
+        "build": "parcel build --no-content-hash index.html --out-dir build --public-url=./ "
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@babel/polyfill": "^7.4.4",
+        "babylonjs": "^4.0.3",
+        "babylonjs-gui": "^4.0.3",
+        "babylonjs-loaders": "^4.0.3",
+        "cannon": "^0.6.2",
+        "parcel": "^1.12.3"
+    },
+    "devDependencies": {},
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/toonnyy8/Slime-FTG.git"
+    },
+    "bugs": {
+        "url": "https://github.com/toonnyy8/Slime-FTG/issues"
+    },
+    "homepage": "https://github.com/toonnyy8/Slime-FTG#readme"
 }
