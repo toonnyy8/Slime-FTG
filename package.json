@@ -1,6 +1,6 @@
 {
     "name": "slime-ftg",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "description": "",
     "main": "index.js",
     "scripts": {
@@ -12,12 +12,13 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "@babel/polyfill": "^7.4.4",
         "babylonjs": "^4.0.3",
         "babylonjs-gui": "^4.0.3",
         "babylonjs-loaders": "^4.0.3",
         "cannon": "^0.6.2",
-        "parcel": "^1.12.3"
+        "core-js": "^3.2.1",
+        "parcel": "^1.12.3",
+        "regenerator-runtime": "^0.13.3"
     },
     "devDependencies": {},
     "repository": {
