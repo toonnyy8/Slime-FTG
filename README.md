@@ -1,3 +1,3 @@
-# babylonTest
+# slime-ftg
 
-https://toonnyy8.github.io/Slime-FTG/build/
+https://toonnyy8.github.io/slime-ftg/build/
