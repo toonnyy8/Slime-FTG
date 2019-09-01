@@ -23,10 +23,10 @@
     "devDependencies": {},
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/toonnyy8/Slime-FTG.git"
+        "url": "git+https://github.com/toonnyy8/slime-ftg.git"
     },
     "bugs": {
-        "url": "https://github.com/toonnyy8/Slime-FTG/issues"
+        "url": "https://github.com/toonnyy8/slime-ftg/issues"
     },
-    "homepage": "https://github.com/toonnyy8/Slime-FTG#readme"
+    "homepage": "https://github.com/toonnyy8/slime-ftg#readme"
 }
