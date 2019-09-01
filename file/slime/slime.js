@@ -56,7 +56,7 @@ export class Actor {
             box.material.alpha = 0
             this._collisionBoxes.push(box)
         })
-        this._bodyBox = new BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 2, updatable: true }, this.scene)
+        this._bodyBox = new BABYLON.MeshBuilder.CreateSphere("sphere", { diameter: 1.8, updatable: true }, this.scene)
         this._bodyBox.setPivotMatrix(new BABYLON.Matrix.Translation(0, 0.5, 0), false);
         this._bodyBox.position = this.mesh.position
         this._bodyBox.material = new BABYLON.StandardMaterial("myMaterial", this.scene);
