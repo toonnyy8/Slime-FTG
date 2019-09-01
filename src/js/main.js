@@ -14,6 +14,12 @@ let canvas = document.getElementById('bobylonCanvas')
 let engine = new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true })
 // CreateScene function that creates and return the scene
 
+let player1, player2
+
+export function getPlayer() {
+    return [player1, player2]
+}
+
 function createScene() {
 
     // This creates a basic Babylon Scene object (non-mesh)
@@ -60,7 +66,6 @@ function createScene() {
     BABYLON.SceneLoader.OnPluginActivatedObservable.addOnce(loader => {
         loader.animationStartMode = BABYLON.GLTFLoaderAnimationStartMode.NONE
     })
-    let player1, player2
     BABYLON.SceneLoader.ImportMesh("", slime.Actor.url(), "", scene, (meshes, particleSystems, skeletons, animationGroups) => {
         console.log(skeletons)
         console.log(meshes)
