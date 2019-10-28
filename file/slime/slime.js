@@ -1717,17 +1717,17 @@ export class Actor {
             this.mesh.position = this.mesh.position.add(this.beInjuredObj.beHitVector)
             this.isHit = false
         }
+        this.beHitNum += 1
+        this.HP -= this.beInjuredObj.atk / this.beHitNum
+        // console.log(this.HP)
+        // console.log(this.vector) 
+
         if (this.cumulativeDamage >= this.maxCumulativeDamage) {
             this.HP -= this.cumulativeDamage
             this.cumulativeDamage = 0
         } else {
-            this.cumulativeDamage += this.beInjuredObj.atk
+            this.cumulativeDamage += this.beInjuredObj.atk / this.beHitNum
         }
-
-        this.beHitNum += 1
-        this.HP -= this.beInjuredObj.atk / this.beHitNum
-        // console.log(this.HP)
-        // console.log(this.vector)
 
         this.beInjuredObj.atk = null
         // this.isHit = false
