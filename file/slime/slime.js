@@ -1432,7 +1432,7 @@ export class Actor {
         if (this.cumulativeDamage < this.maxCumulativeDamage) {
             this.cumulativeDamage = this.cumulativeDamage <= 0 ? 0 : this.cumulativeDamage - 1
         }
-        console.log(this.lastAttackRepeatNum)
+
         if (this.cumulativeDamage == 0 && this.lastAttackRepeatNum >= 1) {
             this.lastAttack = null
             this.lastAttackRepeatNum = 0
