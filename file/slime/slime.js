@@ -576,7 +576,7 @@ export class Actor {
                                 }
                                 this.keyDown.right = true
                                 if (this.shouldFaceTo == "left") {
-                                    this.perfectDefenseTime = 6
+                                    this.perfectDefenseTime = 10
                                 }
                             }
                         }
